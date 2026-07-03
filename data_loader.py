@@ -1,15 +1,22 @@
 ## data_loader.py
 import yfinance as yf
+import requests
 import pandas as pd
 import os
 from config import *
 
 def get_sp500_tickers():
-    """Pull S&P 500 tickers from Wikipedia."""
-    table = pd.read_html(
-        "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    )[0]
-    return table["Symbol"].str.replace(".", "-").tolist()
+    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    table = pd.read_html(response.text)[0]
+    return table["Symbol"].str.replace(".", "-", regex=False).tolist()
 
 def download_prices():
     """Download adjusted close prices and save to disk."""

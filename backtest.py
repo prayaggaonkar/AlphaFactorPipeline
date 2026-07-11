@@ -63,3 +63,39 @@ def build_portfolio(predictions: pd.Series,
     ## Cumulative returns
     cm_returns = (1 + net_pnl).cumprod()
 
+    ## Performance metrics
+    ann_return = net_pnl.mean() * 252
+    ann_vol    = net_pnl.std() * np.sqrt(252)
+    sharpe     = ann_return / ann_vol if ann_vol > 0 else 0
+    max_dd     = (cm_returns / cm_returns.cummax() - 1).min()
+
+    metrics = {
+        "annualized_return": round(ann_return * 100, 2),
+        "annualized_vol":    round(ann_vol * 100, 2),
+        "sharpe_ratio":      round(sharpe, 2),
+        "max_drawdown":      round(max_dd * 100, 2),
+        "win_rate":          round((net_pnl > 0).mean() * 100, 1),
+    }
+
+    print("\n── Backtest Results ──────────────────")
+    for k, v in metrics.items():
+        print(f"  {k:<22} {v}")
+
+    ## Plot
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 7))
+    cm_returns.plot(ax=ax1, label="Strategy", color="steelblue")
+    ax1.set_title("Cumulative returns")
+    ax1.axhline(1, color="gray", linestyle="--", linewidth=0.7)
+    ax1.legend()
+
+    rolling_sharpe = (net_pnl.rolling(63).mean() /
+                      net_pnl.rolling(63).std() * np.sqrt(252))
+    rolling_sharpe.plot(ax=ax2, color="darkorange")
+    ax2.set_title("Rolling 63-day Sharpe ratio")
+    ax2.axhline(0, color="gray", linestyle="--", linewidth=0.7)
+
+    plt.tight_layout()
+    plt.savefig("backtest/results.png", dpi=150)
+    print("\nChart saved to backtest/results.png")
+
+    return metrics, net_pnl, cm_returns

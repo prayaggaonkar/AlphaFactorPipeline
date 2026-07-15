@@ -35,5 +35,13 @@ try:
     fig.add_hline(y=1, line_dash="dash", line_color="gray")
     st.plotly_chart(fig, use_container_width=True)
 
+    ## Rolling Sharpe
+    st.subheader("Rolling 63-day Sharpe")
+    roll_sharpe = (net_pnl.rolling(63).mean() /
+                   net_pnl.rolling(63).std() * (252**0.5))
+    fig2 = px.line(roll_sharpe)
+    fig2.add_hline(y=0, line_dash="dash", line_color="gray")
+    st.plotly_chart(fig2, use_container_width=True)
+
 except FileNotFoundError:
     st.warning("Run main.py first to generate results, then refresh this page.")

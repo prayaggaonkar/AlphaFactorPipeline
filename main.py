@@ -12,3 +12,17 @@ volume = yf.download(
     list(prices.columns), start=START_DATE, end=END_DATE,
     auto_adjust=True, progress=False
 )["Volume"].reindex(columns=prices.columns)
+
+print("=== Step 2: Compute returns ===")
+daily_ret, fwd_ret = compute_returns(prices)
+
+print("=== Step 3: Build factors ===")
+factor_matrix = build_factor_matrix(prices, volume)
+
+print("=== Step 4: Train model ===")
+predictions, model, mean_ic = train_and_evaluate(factor_matrix, fwd_ret)
+
+print("=== Step 5: Backtest ===")
+metrics, net_pnl, cum_returns = build_portfolio(predictions, daily_ret)
+
+print("\nDone! Check backtest/results.png and models/shap_importance.png")

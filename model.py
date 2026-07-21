@@ -20,9 +20,6 @@ def information_coefficient(predictions: pd.Series,
     ic, _ = spearmanr(predictions[common], actual[common])
     return ic
 
-fwd_stacked = fwd_returns.stack()
-fwd_stacked.index.names = ["date", "ticker"]
-
 def train_and_evaluate(factor_matrix: pd.DataFrame,
                        fwd_returns: pd.DataFrame):
     """

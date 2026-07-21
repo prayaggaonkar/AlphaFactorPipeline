@@ -22,37 +22,36 @@ def get_sp500_tickers():
 
 
 def download_prices():
+    # Disable yfinance cache to avoid SQLite errors
+    yf.set_tz_cache_location(None)
+    
     tickers = get_sp500_tickers()[:150]
     print(f"Downloading {len(tickers)} tickers in batches...")
 
-    batch_size = 25
+    batch_size = 10          # smaller batches
     all_data = []
 
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i + batch_size]
-        print(f"Batch {i//batch_size + 1}: downloading {batch[0]} to {batch[-1]}...")
+        print(f"Batch {i//batch_size + 1}: {batch[0]} to {batch[-1]}...")
         try:
             df = yf.download(
                 batch,
                 start=START_DATE,
                 end=END_DATE,
                 auto_adjust=True,
-                progress=False
+                progress=False,
+                threads=False    # disable multithreading — this causes the open files error
             )["Close"]
-            all_data.append(df)
+            if not df.empty:
+                all_data.append(df)
         except Exception as e:
-            print(f"Batch failed: {e}, skipping...")
-        time.sleep(3)  # wait 3 seconds between batches
+            print(f"Batch failed, skipping: {e}")
+        time.sleep(5)            # longer pause between batches
 
     combined = pd.concat(all_data, axis=1)
-
-    # Drop duplicate columns (sometimes yfinance returns dupes)
     combined = combined.loc[:, ~combined.columns.duplicated()]
-
-    # Drop tickers with more than 20% missing data
     combined = combined.dropna(axis=1, thresh=int(len(combined) * 0.8))
-
-    # Forward fill small gaps
     combined = combined.ffill(limit=3)
 
     os.makedirs(DATA_DIR, exist_ok=True)

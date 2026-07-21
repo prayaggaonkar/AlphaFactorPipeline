@@ -31,7 +31,7 @@ def momentum_12m_skip1m(prices: pd.DataFrame) -> pd.DataFrame:
 ## ── MEAN REVERSION FACTORS ────────────────────────────────────────
 
 def reversal_1w(prices: pd.DataFrame) -> pd.DataFrame:
-    raw = prices.pct_change(5).shift(1)
+    raw = -prices.pct_change(5).shift(1)
     return normalize(winsorize(raw))
 
 def distance_from_ma(prices: pd.DataFrame, window: int = 20) -> pd.DataFrame:
@@ -43,7 +43,7 @@ def distance_from_ma(prices: pd.DataFrame, window: int = 20) -> pd.DataFrame:
 
 def realized_vol(prices: pd.DataFrame, window: int = 21) -> pd.DataFrame:
     daily_ret = prices.pct_change()
-    raw = daily_ret.rolling(window).std().shift(1)
+    raw = -daily_ret.rolling(window).std().shift(1)
     return normalize(winsorize(raw))
 
 ## ── VOLUME FACTORS ────────────────────────────────────────────────

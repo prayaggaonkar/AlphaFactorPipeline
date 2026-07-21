@@ -22,37 +22,42 @@ def get_sp500_tickers():
 
 
 def download_prices():
-    # Disable yfinance cache to avoid SQLite errors
-    yf.set_tz_cache_location(None)
-    
     tickers = get_sp500_tickers()[:150]
     print(f"Downloading {len(tickers)} tickers in batches...")
 
-    batch_size = 10          # smaller batches
+    batch_size = 10
     all_data = []
 
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i + batch_size]
         print(f"Batch {i//batch_size + 1}: {batch[0]} to {batch[-1]}...")
         try:
-            df = yf.download(
-                batch,
-                start=START_DATE,
-                end=END_DATE,
-                auto_adjust=True,
-                progress=False,
-                threads=False    # disable multithreading — this causes the open files error
-            )["Close"]
-            if not df.empty:
-                all_data.append(df)
+            # Download one ticker at a time to avoid threading issues
+            batch_frames = []
+            for ticker in batch:
+                try:
+                    t = yf.Ticker(ticker)
+                    hist = t.history(
+                        start=START_DATE,
+                        end=END_DATE,
+                        auto_adjust=True
+                    )["Close"]
+                    if len(hist) > 100:   # skip if barely any data
+                        hist.name = ticker
+                        batch_frames.append(hist)
+                except Exception:
+                    pass
+            if batch_frames:
+                all_data.append(pd.concat(batch_frames, axis=1))
         except Exception as e:
-            print(f"Batch failed, skipping: {e}")
-        time.sleep(5)            # longer pause between batches
+            print(f"Batch failed: {e}")
+        time.sleep(2)
 
     combined = pd.concat(all_data, axis=1)
     combined = combined.loc[:, ~combined.columns.duplicated()]
     combined = combined.dropna(axis=1, thresh=int(len(combined) * 0.8))
     combined = combined.ffill(limit=3)
+    combined.index = pd.to_datetime(combined.index).tz_localize(None)  # strip timezone
 
     os.makedirs(DATA_DIR, exist_ok=True)
     combined.to_parquet(f"{DATA_DIR}/prices.parquet")

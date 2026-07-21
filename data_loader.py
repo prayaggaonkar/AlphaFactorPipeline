@@ -3,6 +3,7 @@ import yfinance as yf
 import requests
 import pandas as pd
 import os
+import io
 from config import *
 
 def get_sp500_tickers():
@@ -15,7 +16,7 @@ def get_sp500_tickers():
     response = requests.get(url, headers=headers)
     response.raise_for_status()
 
-    table = pd.read_html(response.text)[0]
+    table = pd.read_html(io.StringIO(response.text))[0]
     return table["Symbol"].str.replace(".", "-", regex=False).tolist()
 
 def download_prices():

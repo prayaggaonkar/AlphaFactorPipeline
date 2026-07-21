@@ -62,8 +62,8 @@ def build_portfolio(predictions: pd.Series,
     ## Save for Streamlit dashboard
     import os
     os.makedirs("backtest", exist_ok=True)
-    cum_returns.to_parquet("backtest/cum_returns.parquet")
-    net_pnl.to_parquet("backtest/net_pnl.parquet")
+    cum_returns.to_frame("cum_returns").to_parquet("backtest/cum_returns.parquet")
+    net_pnl.to_frame("net_pnl").to_parquet("backtest/net_pnl.parquet")
 
     ## Performance metrics
     ann_return = net_pnl.mean() * 252

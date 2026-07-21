@@ -6,6 +6,9 @@ from backtest    import build_portfolio
 import yfinance as yf
 from config import UNIVERSE_SIZE, START_DATE, END_DATE
 
+import os
+os.environ["LOKY_MAX_CPU_COUNT"] = "4"
+
 print("=== Step 1: Load data ===")
 prices = load_prices()      # run data_loader.py first to download
 volume = yf.download(

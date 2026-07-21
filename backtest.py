@@ -18,11 +18,11 @@ def build_portfolio(predictions: pd.Series,
 
         sig = predictions.xs(date, level="date").dropna()
 
-        q20 = sig.quantile(0.20)
-        q80 = sig.quantile(0.80)
+        q30 = sig.quantile(0.30)
+        q70 = sig.quantile(0.70)
 
-        longs  = sig[sig >= q80].index
-        shorts = sig[sig <= q20].index
+        shorts  = sig[sig >= q70].index
+        longs = sig[sig <= q30].index
 
         if len(longs) == 0 or len(shorts) == 0:
             continue

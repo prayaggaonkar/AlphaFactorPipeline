@@ -1,71 +1,85 @@
-## factor_lib.py
+## factor_lib.py — rebuilt around factors that showed positive IC
 import pandas as pd
 import numpy as np
 from config import *
 
-def normalize(factor: pd.DataFrame) -> pd.DataFrame:
-    ranked = factor.rank(axis=1, pct=True)
-    return ranked - 0.5
+def normalize(factor):
+    return factor.rank(axis=1, pct=True) - 0.5
 
-def winsorize(factor: pd.DataFrame, pct: float = 0.01) -> pd.DataFrame:
+def winsorize(factor, pct=0.01):
     lo = factor.quantile(pct, axis=1)
     hi = factor.quantile(1 - pct, axis=1)
     return factor.clip(lower=lo, upper=hi, axis=0)
 
-## ── MOMENTUM FACTORS ──────────────────────────────────────────────
-
-def momentum_1m(prices: pd.DataFrame) -> pd.DataFrame:
-    raw = prices.pct_change(21).shift(1)
+## KEEP: positive IC
+def dist_ma60(prices):
+    """Distance from 60-day MA — strongest factor (IC 0.03)"""
+    ma  = prices.rolling(60).mean().shift(1)
+    raw = -(prices.shift(1) / ma - 1)   # negative = mean reversion
     return normalize(winsorize(raw))
 
-def momentum_3m(prices: pd.DataFrame) -> pd.DataFrame:
-    raw = prices.pct_change(63).shift(1)
-    return normalize(winsorize(raw))
-
-def momentum_12m_skip1m(prices: pd.DataFrame) -> pd.DataFrame:
-    ret_12m = prices.pct_change(252).shift(1)
-    ret_1m  = prices.pct_change(21).shift(1)
-    raw = ret_12m - ret_1m
-    return normalize(winsorize(raw))
-
-## ── MEAN REVERSION FACTORS ────────────────────────────────────────
-
-def reversal_1w(prices: pd.DataFrame) -> pd.DataFrame:
-    raw = -prices.pct_change(5).shift(1)
-    return normalize(winsorize(raw))
-
-def distance_from_ma(prices: pd.DataFrame, window: int = 20) -> pd.DataFrame:
-    ma  = prices.rolling(window).mean().shift(1)
+def dist_ma20(prices):
+    """Distance from 20-day MA"""
+    ma  = prices.rolling(20).mean().shift(1)
     raw = -(prices.shift(1) / ma - 1)
     return normalize(winsorize(raw))
 
-## ── VOLATILITY FACTORS ────────────────────────────────────────────
+def dist_ma120(prices):
+    """Distance from 120-day MA — longer horizon"""
+    ma  = prices.rolling(120).mean().shift(1)
+    raw = -(prices.shift(1) / ma - 1)
+    return normalize(winsorize(raw))
 
-def realized_vol(prices: pd.DataFrame, window: int = 21) -> pd.DataFrame:
+def reversal_1m(prices):
+    """1-month reversal — showed weak positive IC"""
+    raw = -prices.pct_change(21).shift(1)
+    return normalize(winsorize(raw))
+
+def reversal_1w(prices):
+    """1-week reversal"""
+    raw = -prices.pct_change(5).shift(1)
+    return normalize(winsorize(raw))
+
+def bb_position(prices, window=20):
+    """
+    Bollinger Band position — where is price within its band?
+    Below lower band = oversold = buy signal (mean reversion)
+    """
+    ma  = prices.rolling(window).mean().shift(1)
+    std = prices.rolling(window).std().shift(1)
+    raw = -(prices.shift(1) - ma) / (2 * std + 1e-8)
+    return normalize(winsorize(raw))
+
+def rsi_reversal(prices, window=14):
+    """
+    RSI — but used as a mean reversion signal.
+    Low RSI (oversold) = positive signal.
+    """
+    delta = prices.diff().shift(1)
+    gain  = delta.clip(lower=0).rolling(window).mean()
+    loss  = (-delta.clip(upper=0)).rolling(window).mean()
+    rs    = gain / (loss + 1e-8)
+    rsi   = 100 - (100 / (1 + rs))
+    raw   = -(rsi - 50)   # flip: low RSI = positive signal
+    return normalize(winsorize(raw))
+
+## FLIP: vol_21d had negative IC meaning HIGH vol = positive signal
+def vol_momentum(prices, window=21):
+    """High recent volatility = positive signal (per our data)"""
     daily_ret = prices.pct_change()
-    raw = -daily_ret.rolling(window).std().shift(1)
+    raw = daily_ret.rolling(window).std().shift(1)   # no negation
     return normalize(winsorize(raw))
 
-## ── VOLUME FACTORS ────────────────────────────────────────────────
-
-def relative_volume(volume: pd.DataFrame, window: int = 20) -> pd.DataFrame:
-    avg_vol = volume.rolling(window).mean().shift(1)
-    raw = (volume.shift(1) / avg_vol) - 1
-    return normalize(winsorize(raw))
-
-## ── COMPUTE ALL FACTORS ───────────────────────────────────────────
-
-def build_factor_matrix(prices: pd.DataFrame,
-                        volume: pd.DataFrame) -> pd.DataFrame:
+def build_factor_matrix(prices, volume=None):
     factors = {
-        "mom_1m":          momentum_1m(prices),
-        "mom_3m":          momentum_3m(prices),
-        "mom_12m_skip1m":  momentum_12m_skip1m(prices),
-        "reversal_1w":     reversal_1w(prices),
-        "dist_ma20":       distance_from_ma(prices, 20),
-        "dist_ma60":       distance_from_ma(prices, 60),
-        "vol_21d":         realized_vol(prices, 21),
-        "rel_volume":      relative_volume(volume, 20),
+        "dist_ma20":    dist_ma20(prices),
+        "dist_ma60":    dist_ma60(prices),
+        "dist_ma120":   dist_ma120(prices),
+        "reversal_1w":  reversal_1w(prices),
+        "reversal_1m":  reversal_1m(prices),
+        "bb_position":  bb_position(prices),
+        "rsi_reversal": rsi_reversal(prices),
+        "vol_momentum": vol_momentum(prices),
     }
 
     panels = []

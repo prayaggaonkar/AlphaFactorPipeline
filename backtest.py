@@ -21,8 +21,8 @@ def build_portfolio(predictions: pd.Series,
         q30 = sig.quantile(0.30)
         q70 = sig.quantile(0.70)
 
-        shorts  = sig[sig >= q70].index
-        longs = sig[sig <= q30].index
+        longs  = sig[sig >= q70].index
+        shorts = sig[sig <= q30].index
 
         if len(longs) == 0 or len(shorts) == 0:
             continue

@@ -6,68 +6,70 @@ from config import *
 
 def build_portfolio(predictions: pd.Series,
                     daily_returns: pd.DataFrame) -> dict:
-    """
-    Convert model predictions into a portfolio and simulate returns.
 
-    predictions: MultiIndex Series (date, ticker) -> predicted return
-    daily_returns: DataFrame (date x ticker) -> actual daily returns
-    """
-    ## Get all dates where we have predictions
     pred_dates = predictions.index.get_level_values("date").unique()
 
-    weights_list = []
+    weight_df = pd.DataFrame(0.0, index=daily_returns.index,
+                             columns=daily_returns.columns)
 
-    for date in pred_dates[::REBAL_FREQ]:    # rebalance every N days
+    for date in pred_dates[::REBAL_FREQ]:
+        if date not in daily_returns.index:
+            continue
+
         sig = predictions.xs(date, level="date").dropna()
 
-        ## Rank into quintiles (5 groups)
-        q20 = sig.quantile(0.20)   # bottom 20%
-        q80 = sig.quantile(0.80)   # top 20%
+        q20 = sig.quantile(0.20)
+        q80 = sig.quantile(0.80)
 
-        longs  = sig[sig >= q80].index   # buy these
-        shorts = sig[sig <= q20].index   # short these
+        longs  = sig[sig >= q80].index
+        shorts = sig[sig <= q20].index
 
         if len(longs) == 0 or len(shorts) == 0:
             continue
 
+        ## Find the integer position of this date and fill forward REBAL_FREQ rows
+        idx_pos = daily_returns.index.get_loc(date)
+        end_pos = min(idx_pos + REBAL_FREQ, len(daily_returns))
+        rows    = daily_returns.index[idx_pos:end_pos]
+
+        ## Build weight vector for this rebalance
         w = pd.Series(0.0, index=daily_returns.columns)
-        w[longs]  =  0.5 / len(longs)    # long leg = 50% of NAV
-        w[shorts] = -0.5 / len(shorts)   # short leg = 50% of NAV
+        valid_longs  = [t for t in longs  if t in w.index]
+        valid_shorts = [t for t in shorts if t in w.index]
 
-        weights_list.append({"date": date, "weights": w})
+        if valid_longs:
+            w[valid_longs]  =  0.5 / len(valid_longs)
+        if valid_shorts:
+            w[valid_shorts] = -0.5 / len(valid_shorts)
 
-    ## Forward-fill weights between rebalance dates
-    all_dates   = daily_returns.index
-    weight_df   = pd.DataFrame(0.0, index=all_dates,
-                               columns=daily_returns.columns)
-    for item in weights_list:
-        date = item["date"]
-        if date in all_dates:
-            weight_df.loc[date:].iloc[:REBAL_FREQ] = item["weights"].values
+        ## Use .loc to assign cleanly — avoids ChainedAssignmentError
+        weight_df.loc[rows, :] = w.values
 
-    weight_df = weight_df.shift(1)   # use yesterday's weights for today's returns
+    ## Shift weights by 1 day: use yesterday's weights on today's returns
+    weight_df = weight_df.shift(1).fillna(0.0)
 
-    ## Daily P&L: sum of (weight * return) across all stocks
+    ## Daily P&L
     daily_pnl = (weight_df * daily_returns).sum(axis=1)
 
-    ## Transaction costs: on rebalance days, pay COST_BPS per unit of turnover
-    rebal_mask = pd.Series(False, index=all_dates)
-    for item in weights_list:
-        if item["date"] in all_dates:
-            rebal_mask[item["date"]] = True
-
+    ## Transaction costs on rebalance days
     turnover  = weight_df.diff().abs().sum(axis=1)
-    tc        = turnover * (COST_BPS / 10000) * rebal_mask
+    tc        = turnover * (COST_BPS / 10000)
     net_pnl   = daily_pnl - tc
 
     ## Cumulative returns
-    cm_returns = (1 + net_pnl).cumprod()
+    cum_returns = (1 + net_pnl).cumprod()
+
+    ## Save for Streamlit dashboard
+    import os
+    os.makedirs("backtest", exist_ok=True)
+    cum_returns.to_parquet("backtest/cum_returns.parquet")
+    net_pnl.to_parquet("backtest/net_pnl.parquet")
 
     ## Performance metrics
     ann_return = net_pnl.mean() * 252
     ann_vol    = net_pnl.std() * np.sqrt(252)
     sharpe     = ann_return / ann_vol if ann_vol > 0 else 0
-    max_dd     = (cm_returns / cm_returns.cummax() - 1).min()
+    max_dd     = (cum_returns / cum_returns.cummax() - 1).min()
 
     metrics = {
         "annualized_return": round(ann_return * 100, 2),
@@ -83,19 +85,20 @@ def build_portfolio(predictions: pd.Series,
 
     ## Plot
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 7))
-    cm_returns.plot(ax=ax1, label="Strategy", color="steelblue")
-    ax1.set_title("Cumulative returns")
+
+    cum_returns.plot(ax=ax1, color="steelblue", label="Strategy")
+    ax1.set_title("Cumulative Returns")
     ax1.axhline(1, color="gray", linestyle="--", linewidth=0.7)
     ax1.legend()
 
-    rolling_sharpe = (net_pnl.rolling(63).mean() /
-                      net_pnl.rolling(63).std() * np.sqrt(252))
-    rolling_sharpe.plot(ax=ax2, color="darkorange")
-    ax2.set_title("Rolling 63-day Sharpe ratio")
+    roll_sharpe = (net_pnl.rolling(63).mean() /
+                   net_pnl.rolling(63).std() * np.sqrt(252))
+    roll_sharpe.plot(ax=ax2, color="darkorange")
+    ax2.set_title("Rolling 63-day Sharpe")
     ax2.axhline(0, color="gray", linestyle="--", linewidth=0.7)
 
     plt.tight_layout()
     plt.savefig("backtest/results.png", dpi=150)
     print("\nChart saved to backtest/results.png")
 
-    return metrics, net_pnl, cm_returns
+    return metrics, net_pnl, cum_returns

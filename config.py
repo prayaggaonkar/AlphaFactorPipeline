@@ -1,7 +1,7 @@
 ## config.py
 ## Change these values to experiment with different setups
 
-UNIVERSE_SIZE = 200        # number of stocks (start small, expand later)
+UNIVERSE_SIZE = 150        # number of stocks (start small, expand later)
 START_DATE    = "2018-01-01"
 END_DATE      = "2024-01-01"
 FORWARD_DAYS  = 5         # predict 5-day future returns

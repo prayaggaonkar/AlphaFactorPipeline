@@ -43,15 +43,16 @@ def train_and_evaluate(factor_matrix: pd.DataFrame,
     ic_by_fold = []
 
     model = lgb.LGBMRegressor(
-        n_estimators=200,
-        learning_rate=0.05,
-        num_leaves=31,
-        min_child_samples=50,   # at least 50 samples per leaf
-        reg_lambda=1.0,         # regularization — prevents overfitting
-        subsample=0.8,          # use 80% of rows per tree
-        colsample_bytree=0.8,   # use 80% of features per tree
+        n_estimators=100,       # fewer trees
+        learning_rate=0.01,     # slower learning
+        num_leaves=16,          # shallower trees (was 31)
+        min_child_samples=100,  # need more samples per leaf (was 50)
+        reg_lambda=5.0,         # stronger regularization (was 1.0)
+        reg_alpha=1.0,          # add L1 regularization
+        subsample=0.7,
+        colsample_bytree=0.7,
         random_state=42,
-        verbose=-1              # suppress output
+        verbose=-1
     )
 
     ## Walk-forward loop

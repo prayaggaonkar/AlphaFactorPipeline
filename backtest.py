@@ -12,7 +12,7 @@ def build_portfolio(predictions: pd.Series,
     weight_df = pd.DataFrame(0.0, index=daily_returns.index,
                              columns=daily_returns.columns)
 
-    for date in pred_dates[::REBAL_FREQ]:
+    for date in pred_dates:
         if date not in daily_returns.index:
             continue
 

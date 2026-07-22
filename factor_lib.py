@@ -86,16 +86,16 @@ def rsi_reversal(prices, window=14):
 def build_factor_matrix(prices: pd.DataFrame,
                         volume: pd.DataFrame = None) -> pd.DataFrame:
     factors = {
-        "mom_1m":         momentum_1m(prices),
-        "mom_3m":         momentum_3m(prices),
-        "mom_12m_skip1m": momentum_12m_skip1m(prices),
-        "reversal_1w":    reversal_1w(prices),
         "dist_ma20":      distance_from_ma(prices, 20),
         "dist_ma60":      distance_from_ma(prices, 60),
-        "dist_ma120":     dist_ma120(prices),
-        "vol_21d":        realized_vol(prices, 21),
-        "vol_momentum":   vol_momentum(prices, 21),
-        "rsi_reversal":   rsi_reversal(prices),
+        "dist_ma120":     dist_ma120(prices),        # add this
+        "reversal_1w":    reversal_1w(prices),
+        "rsi_reversal":   rsi_reversal(prices),      # add this
+        # momentum FLIPPED — negative IC means signal is inverted
+        "mom_1m_flip":    _prep(normalize(winsorize(prices.pct_change(21).shift(1)))),
+        "mom_3m_flip":    _prep(normalize(winsorize(prices.pct_change(63).shift(1)))),
+        # vol FLIPPED — high vol was positive signal
+        "vol_momentum":   vol_momentum(prices),      # add this (no negation)
     }
 
     panels = []

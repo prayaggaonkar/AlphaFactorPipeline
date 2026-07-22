@@ -9,14 +9,34 @@ prices = load_prices()
 daily_ret, fwd_ret = compute_returns(prices)
 
 factors = {
-    "dist_ma20":    distance_from_ma(prices, 20),
-    "dist_ma60":    distance_from_ma(prices, 60),
-    "dist_ma120":   dist_ma120(prices),
-    "reversal_1w":  reversal_1w(prices),
-    "rsi_reversal": rsi_reversal(prices),
-    "vol_momentum": vol_momentum(prices),
-    "mom_1m_flip":  mom_1m_flip(prices),
-    "mom_3m_flip":  mom_3m_flip(prices),
+    "mom_1m": momentum_1m(prices),
+    "mom_3m": momentum_3m(prices),
+    "mom_6m": momentum_6m(prices),
+    "mom_12_1": momentum_12_1(prices),
+    "mom_accel": momentum_acceleration(prices),
+
+    "rev_5d": reversal_5d(prices),
+    "rev_10d": reversal_10d(prices),
+    "ma20_dist": distance_ma(prices, 20),
+    "ma50_dist": distance_ma(prices, 50),
+    "rsi": rsi(prices),
+    "bollinger": bollinger_zscore(prices),
+
+    "ema_cross": ema_crossover(prices),
+    "ma200_dist": ma200_distance(prices),
+    "trend_slope": trend_slope(prices),
+
+    "realized_vol": realized_vol(prices),
+    "vol_ratio": volatility_ratio(prices),
+    "downside_vol": downside_volatility(prices),
+    "parkinson_vol": parkinson_volatility(prices),
+
+    "skew": skewness(prices),
+    "kurtosis": kurtosis(prices),
+    "autocorr": autocorrelation(prices),
+
+    "breakout": breakout_52w(prices),
+    "price_percentile": price_percentile(prices)
 }
 
 print(f"{'Factor':<20} {'Mean IC':>10} {'ICIR':>10} {'Positive %':>12}")

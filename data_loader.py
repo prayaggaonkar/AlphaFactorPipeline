@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import yfinance as yf
 import os, time
 from config import *
 
@@ -19,45 +20,46 @@ TICKERS = [
 ]
 
 def download_prices():
-    # Import here so if curl_cffi isn't installed we get a clear error
-    try:
-        import yfinance as yf
-        from curl_cffi import requests as curl_requests
-        session = curl_requests.Session(impersonate="chrome110")
-    except ImportError:
-        raise ImportError("Run: pip install yfinance curl_cffi")
-
     os.makedirs(DATA_DIR, exist_ok=True)
-    all_series = []
-    failed = []
-
     tickers = list(dict.fromkeys(TICKERS))
-    print(f"Downloading {len(tickers)} tickers...")
+    print(f"Downloading {len(tickers)} tickers in batches...")
 
-    for i, ticker in enumerate(tickers):
+    all_series = []
+
+    # Download in batches of 20 with pauses
+    batch_size = 20
+    for i in range(0, len(tickers), batch_size):
+        batch = tickers[i:i + batch_size]
+        print(f"Batch {i//batch_size + 1}: {batch[0]} to {batch[-1]}...")
         try:
-            t = yf.Ticker(ticker, session=session)
-            hist = t.history(start=START_DATE, end=END_DATE, auto_adjust=True)
-            if hist.empty or len(hist) < 200:
-                failed.append(ticker)
-                continue
-            close = hist["Close"].copy()
-            close.index = pd.to_datetime(close.index).tz_localize(None)
-            close.name = ticker
+            raw = yf.download(
+                batch,
+                start=START_DATE,
+                end=END_DATE,
+                auto_adjust=True,
+                progress=False,
+            )
+            # New yfinance returns ("Close", "AAPL") MultiIndex columns
+            close = raw["Close"]
+            if isinstance(close, pd.Series):
+                # Only one ticker came back
+                close = close.to_frame(name=batch[0])
+            # Drop tickers with less than 200 rows
+            close = close.dropna(axis=1, thresh=200)
             all_series.append(close)
-            if (i + 1) % 20 == 0:
-                print(f"  {i+1}/{len(tickers)} — {len(all_series)} successful")
-            time.sleep(0.5)
+            print(f"  Got {close.shape[1]} tickers")
         except Exception as e:
-            failed.append(ticker)
+            print(f"  Batch failed: {e}")
 
-    print(f"\nFailed: {len(failed)}, Successful: {len(all_series)}")
+        print(f"  Sleeping 10s...")
+        time.sleep(10)
 
     if not all_series:
         raise ValueError("No data downloaded.")
 
     combined = pd.concat(all_series, axis=1)
-    combined.index = pd.to_datetime(combined.index)
+    combined = combined.loc[:, ~combined.columns.duplicated()]
+    combined.index = pd.to_datetime(combined.index).tz_localize(None)
     combined.index.name = "date"
     combined.columns.name = "ticker"
     combined = combined.sort_index()
@@ -65,7 +67,7 @@ def download_prices():
     combined = combined.ffill(limit=3)
 
     combined.to_parquet(f"{DATA_DIR}/prices.parquet")
-    print(f"Saved {combined.shape[1]} tickers, {combined.shape[0]} days")
+    print(f"\nSaved {combined.shape[1]} tickers, {combined.shape[0]} days")
     print(f"Date range: {combined.index[0].date()} → {combined.index[-1].date()}")
     return combined
 

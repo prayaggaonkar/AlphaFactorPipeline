@@ -61,6 +61,27 @@ def relative_volume(volume, window=20):
     raw = (volume.shift(1) / avg_vol) - 1
     return _prep(normalize(winsorize(raw)))
 
+def vol_momentum(prices, window=21):
+    """High recent vol = positive signal (confirmed in our data)"""
+    daily_ret = prices.pct_change()
+    raw = daily_ret.rolling(window).std().shift(1)
+    return _prep(normalize(winsorize(raw)))
+
+def dist_ma120(prices):
+    """Distance from 120-day MA — longer horizon mean reversion"""
+    ma  = prices.rolling(120).mean().shift(1)
+    raw = -(prices.shift(1) / ma - 1)
+    return _prep(normalize(winsorize(raw)))
+
+def rsi_reversal(prices, window=14):
+    """Low RSI = oversold = buy signal"""
+    delta = prices.diff().shift(1)
+    gain  = delta.clip(lower=0).rolling(window).mean()
+    loss  = (-delta.clip(upper=0)).rolling(window).mean()
+    rs    = gain / (loss + 1e-8)
+    rsi   = 100 - (100 / (1 + rs))
+    raw   = -(rsi - 50)
+    return _prep(normalize(winsorize(raw)))
 
 def build_factor_matrix(prices: pd.DataFrame,
                         volume: pd.DataFrame = None) -> pd.DataFrame:
@@ -71,7 +92,10 @@ def build_factor_matrix(prices: pd.DataFrame,
         "reversal_1w":    reversal_1w(prices),
         "dist_ma20":      distance_from_ma(prices, 20),
         "dist_ma60":      distance_from_ma(prices, 60),
+        "dist_ma120":     dist_ma120(prices),
         "vol_21d":        realized_vol(prices, 21),
+        "vol_momentum":   vol_momentum(prices, 21),
+        "rsi_reversal":   rsi_reversal(prices),
     }
 
     panels = []

@@ -96,7 +96,7 @@ def load_prices():
 
 def compute_returns(prices):
     daily_ret = prices.pct_change()
-    fwd_ret = daily_ret.rolling(FORWARD_DAYS).sum().shift(-FORWARD_DAYS)
+    fwd_ret = prices.pct_change(FORWARD_DAYS).shift(-FORWARD_DAYS)
     return daily_ret, fwd_ret
 
 

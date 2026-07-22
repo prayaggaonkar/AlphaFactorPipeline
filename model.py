@@ -10,11 +10,29 @@ from config import *
 
 
 def information_coefficient(predictions, actual):
-    common = predictions.index.intersection(actual.index)
-    if len(common) < 10:
-        return np.nan
-    ic, _ = spearmanr(predictions[common], actual[common])
-    return ic
+    daily_ic=[]
+    dates = predictions.index.get_level_values("date").unique()
+
+    for date in dates:
+        if date not in actual.index.get_level_values("date"):
+            continue
+
+        pred = predictions.xs(date, level="date")
+        act  = actual.xs(date, level="date")
+
+        common = pred.index.intersection(act.index)
+
+        if len(common)<10:
+            continue
+        
+        ic,_ = spearmanr(
+            pred.loc[common],
+            act.loc[common]
+        )
+
+        daily_ic.append(ic)
+
+    return np.nanmean(daily_ic)
 
 
 def train_and_evaluate(factor_matrix: pd.DataFrame,
@@ -57,9 +75,16 @@ def train_and_evaluate(factor_matrix: pd.DataFrame,
         verbose=-1
     )
 
+    '''
+    model = lgb.LGBMRanker(
+        objective="lambdarank",
+        metric="ndcg",
+    )
+    '''
+
     for i in range(TRAIN_WINDOW, len(dates) - TEST_WINDOW, 21):
         train_dates = dates[i - TRAIN_WINDOW: i]
-        test_dates  = dates[i + 5: i + 5 + TEST_WINDOW]
+        test_dates = dates[i + FORWARD_DAYS:i + FORWARD_DAYS + TEST_WINDOW]
 
         train = data[data.index.get_level_values("date").isin(train_dates)]
         test  = data[data.index.get_level_values("date").isin(test_dates)]
@@ -71,6 +96,8 @@ def train_and_evaluate(factor_matrix: pd.DataFrame,
         y_train = train["target"]
         X_test  = test[feature_cols]
         y_test  = test["target"]
+
+        #groups = train.groupby(level="date").size()
 
         model.fit(X_train, y_train)
 

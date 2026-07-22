@@ -1,7 +1,7 @@
+import os, time, shutil, resource
 import pandas as pd
 import numpy as np
 import yfinance as yf
-import os, time
 from config import *
 
 TICKERS = [
@@ -20,17 +20,27 @@ TICKERS = [
 ]
 
 def download_prices():
+    # Fix 1: raise file descriptor limit for this process
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    resource.setrlimit(resource.RLIMIT_NOFILE, (min(10000, hard), hard))
+
+    # Fix 2: clear yfinance SQLite cache before starting
+    for path in [
+        os.path.expanduser("~/Library/Caches/py-yfinance"),
+        os.path.expanduser("~/.cache/py-yfinance"),
+    ]:
+        if os.path.exists(path):
+            shutil.rmtree(path, ignore_errors=True)
+
     os.makedirs(DATA_DIR, exist_ok=True)
     tickers = list(dict.fromkeys(TICKERS))
-    print(f"Downloading {len(tickers)} tickers in batches...")
-
     all_series = []
 
-    # Download in batches of 20 with pauses
-    batch_size = 20
-    for i in range(0, len(tickers), batch_size):
-        batch = tickers[i:i + batch_size]
-        print(f"Batch {i//batch_size + 1}: {batch[0]} to {batch[-1]}...")
+    print(f"Downloading {len(tickers)} tickers in batches of 10...")
+
+    for i in range(0, len(tickers), 10):
+        batch = tickers[i:i + 10]
+        print(f"Batch {i//10 + 1}: {batch[0]} → {batch[-1]}")
         try:
             raw = yf.download(
                 batch,
@@ -39,23 +49,25 @@ def download_prices():
                 auto_adjust=True,
                 progress=False,
             )
-            # New yfinance returns ("Close", "AAPL") MultiIndex columns
-            close = raw["Close"]
-            if isinstance(close, pd.Series):
-                # Only one ticker came back
-                close = close.to_frame(name=batch[0])
-            # Drop tickers with less than 200 rows
-            close = close.dropna(axis=1, thresh=200)
-            all_series.append(close)
-            print(f"  Got {close.shape[1]} tickers")
-        except Exception as e:
-            print(f"  Batch failed: {e}")
+            # Handle MultiIndex columns from newer yfinance
+            if isinstance(raw.columns, pd.MultiIndex):
+                close = raw["Close"]
+            else:
+                close = raw.to_frame(name=batch[0]) if isinstance(raw, pd.Series) else raw[["Close"]].rename(columns={"Close": batch[0]})
 
-        print(f"  Sleeping 10s...")
-        time.sleep(10)
+            close = close.dropna(axis=1, thresh=200)
+            if not close.empty:
+                all_series.append(close)
+                print(f"  ✓ {close.shape[1]} tickers")
+            else:
+                print(f"  ✗ no valid data")
+        except Exception as e:
+            print(f"  ✗ batch failed: {e}")
+
+        time.sleep(10)  # 10s between batches
 
     if not all_series:
-        raise ValueError("No data downloaded.")
+        raise ValueError("No data downloaded. Try running: ulimit -n 10000 first.")
 
     combined = pd.concat(all_series, axis=1)
     combined = combined.loc[:, ~combined.columns.duplicated()]
@@ -71,6 +83,7 @@ def download_prices():
     print(f"Date range: {combined.index[0].date()} → {combined.index[-1].date()}")
     return combined
 
+
 def load_prices():
     df = pd.read_parquet(f"{DATA_DIR}/prices.parquet")
     df.index = pd.to_datetime(df.index)
@@ -80,10 +93,12 @@ def load_prices():
     df.columns.name = "ticker"
     return df
 
+
 def compute_returns(prices):
     daily_ret = prices.pct_change()
     fwd_ret = daily_ret.rolling(FORWARD_DAYS).sum().shift(-FORWARD_DAYS)
     return daily_ret, fwd_ret
+
 
 if __name__ == "__main__":
     download_prices()

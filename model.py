@@ -45,14 +45,14 @@ def train_and_evaluate(factor_matrix: pd.DataFrame,
     ic_by_fold = []
 
     model = lgb.LGBMRegressor(
-        n_estimators=100,
-        learning_rate=0.01,
-        num_leaves=16,
-        min_child_samples=100,
-        reg_lambda=5.0,
-        reg_alpha=1.0,
-        subsample=0.7,
-        colsample_bytree=0.7,
+        n_estimators=200,
+        learning_rate=0.02,
+        num_leaves=24,
+        min_child_samples=50,
+        reg_lambda=2.0,
+        reg_alpha=0.5,
+        subsample=0.8,
+        colsample_bytree=0.8,
         random_state=42,
         verbose=-1
     )

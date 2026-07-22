@@ -9,13 +9,14 @@ prices = load_prices()
 daily_ret, fwd_ret = compute_returns(prices)
 
 factors = {
-    "mom_1m":         momentum_1m(prices),
-    "mom_3m":         momentum_3m(prices),
-    "mom_12m_skip1m": momentum_12m_skip1m(prices),
-    "reversal_1w":    reversal_1w(prices),
-    "dist_ma20":      distance_from_ma(prices, 20),
-    "dist_ma60":      distance_from_ma(prices, 60),
-    "vol_21d":        realized_vol(prices, 21),
+    "dist_ma20":    distance_from_ma(prices, 20),
+    "dist_ma60":    distance_from_ma(prices, 60),
+    "dist_ma120":   dist_ma120(prices),
+    "reversal_1w":  reversal_1w(prices),
+    "rsi_reversal": rsi_reversal(prices),
+    "vol_momentum": vol_momentum(prices),
+    "mom_1m_flip":  mom_1m_flip(prices),
+    "mom_3m_flip":  mom_3m_flip(prices),
 }
 
 print(f"{'Factor':<20} {'Mean IC':>10} {'ICIR':>10} {'Positive %':>12}")

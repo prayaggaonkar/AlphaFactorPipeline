@@ -1,4 +1,4 @@
-# debug.py
+# debug_factors.py
 from data_loader import load_prices, compute_returns
 from factor_lib import *
 from scipy.stats import spearmanr
@@ -9,39 +9,25 @@ prices = load_prices()
 daily_ret, fwd_ret = compute_returns(prices)
 
 factors = {
-    "mom_1m": momentum_1m(prices),
-    "mom_3m": momentum_3m(prices),
-    "mom_6m": momentum_6m(prices),
-    "mom_12_1": momentum_12_1(prices),
-    "mom_accel": momentum_acceleration(prices),
-
-    "rev_5d": reversal_5d(prices),
-    "rev_10d": reversal_10d(prices),
-    "ma20_dist": distance_ma(prices, 20),
-    "ma50_dist": distance_ma(prices, 50),
-    "rsi": rsi(prices),
-    "bollinger": bollinger_zscore(prices),
-
-    "ema_cross": ema_crossover(prices),
-    "ma200_dist": ma200_distance(prices),
-    "trend_slope": trend_slope(prices),
-
-    "realized_vol": realized_vol(prices),
-    "vol_ratio": volatility_ratio(prices),
-    "downside_vol": downside_volatility(prices),
-    "parkinson_vol": parkinson_volatility(prices),
-
-    "skew": skewness(prices),
-    "kurtosis": kurtosis(prices),
-    "autocorr": autocorrelation(prices),
-
-    "breakout": breakout_52w(prices),
-    "price_percentile": price_percentile(prices)
+    "mom_1m":        momentum_1m(prices),
+    "mom_3m":        momentum_3m(prices),
+    "mom_6m":        momentum_6m(prices),
+    "mom_12_1":      momentum_12_1(prices),
+    "rev_5d":        reversal_5d(prices),
+    "rev_10d":       reversal_10d(prices),
+    "ma20_dist":     distance_ma(prices, 20),
+    "ma50_dist":     distance_ma(prices, 50),
+    "rsi":           rsi(prices),
+    "bollinger":     bollinger_zscore(prices),
+    "realized_vol":  realized_vol(prices),
+    "breakout":      breakout_52w(prices),
 }
 
-print(f"{'Factor':<20} {'Mean IC':>10} {'ICIR':>10} {'Positive %':>12}")
-print("-" * 55)
+print(f"Forward return period: {FORWARD_DAYS} days")
+print(f"{'Factor':<20} {'Mean IC':>10} {'ICIR':>10} {'Positive%':>12}")
+print("-" * 56)
 
+results = {}
 for name, factor in factors.items():
     ics = []
     for date in factor.index[252::5]:
@@ -58,4 +44,12 @@ for name, factor in factors.items():
     if len(ics) == 0:
         print(f"{name:<20} {'no data':>10}")
         continue
-    print(f"{name:<20} {ics.mean():>10.4f} {(ics.mean()/ics.std()):>10.2f} {(ics>0).mean()*100:>11.1f}%")
+    mean_ic = ics.mean()
+    icir = mean_ic / ics.std() if ics.std() > 0 else 0
+    pos = (ics > 0).mean() * 100
+    results[name] = mean_ic
+    print(f"{name:<20} {mean_ic:>10.4f} {icir:>10.2f} {pos:>11.1f}%")
+
+print("\n── Top positive factors ──")
+for name, ic in sorted(results.items(), key=lambda x: x[1], reverse=True)[:5]:
+    print(f"  {name}: {ic:.4f}")

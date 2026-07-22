@@ -1,38 +1,44 @@
-## backtest.py
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import os
 from config import *
+
 
 def build_portfolio(predictions: pd.Series,
                     daily_returns: pd.DataFrame) -> dict:
 
-    pred_dates = predictions.index.get_level_values("date").unique()
+    pred_dates = predictions.index.get_level_values("date").unique().sort_values()
 
-    weight_df = pd.DataFrame(0.0, index=daily_returns.index,
-                             columns=daily_returns.columns)
+    weight_df = pd.DataFrame(
+        0.0,
+        index=daily_returns.index,
+        columns=daily_returns.columns
+    )
 
-    for date in pred_dates:
+    # Rebalance every REBAL_FREQ prediction dates
+    for date in pred_dates[::REBAL_FREQ]:
         if date not in daily_returns.index:
             continue
 
         sig = predictions.xs(date, level="date").dropna()
 
-        qLow = sig.quantile(0.20)
-        qHigh = sig.quantile(0.80)
+        # Top/bottom 20% — tighter quintiles = stronger signal
+        q20 = sig.quantile(0.20)
+        q80 = sig.quantile(0.80)
 
-        longs  = sig[sig >= qHigh].index
-        shorts = sig[sig <= qLow].index
+        longs  = sig[sig >= q80].index
+        shorts = sig[sig <= q20].index
 
         if len(longs) == 0 or len(shorts) == 0:
             continue
 
-        ## Find the integer position of this date and fill forward REBAL_FREQ rows
         idx_pos = daily_returns.index.get_loc(date)
         end_pos = min(idx_pos + REBAL_FREQ, len(daily_returns))
         rows    = daily_returns.index[idx_pos:end_pos]
 
-        ## Build weight vector for this rebalance
         w = pd.Series(0.0, index=daily_returns.columns)
         valid_longs  = [t for t in longs  if t in w.index]
         valid_shorts = [t for t in shorts if t in w.index]
@@ -42,30 +48,22 @@ def build_portfolio(predictions: pd.Series,
         if valid_shorts:
             w[valid_shorts] = -0.5 / len(valid_shorts)
 
-        ## Use .loc to assign cleanly — avoids ChainedAssignmentError
         weight_df.loc[rows, :] = w.values
 
-    ## Shift weights by 1 day: use yesterday's weights on today's returns
     weight_df = weight_df.shift(1).fillna(0.0)
 
-    ## Daily P&L
     daily_pnl = (weight_df * daily_returns).sum(axis=1)
 
-    ## Transaction costs on rebalance days
-    turnover  = weight_df.diff().abs().sum(axis=1)
-    tc        = turnover * (COST_BPS / 10000)
-    net_pnl   = daily_pnl - tc
+    turnover = weight_df.diff().abs().sum(axis=1)
+    tc       = turnover * (COST_BPS / 10000)
+    net_pnl  = daily_pnl - tc
 
-    ## Cumulative returns
     cum_returns = (1 + net_pnl).cumprod()
 
-    ## Save for Streamlit dashboard
-    import os
     os.makedirs("backtest", exist_ok=True)
     cum_returns.to_frame("cum_returns").to_parquet("backtest/cum_returns.parquet")
     net_pnl.to_frame("net_pnl").to_parquet("backtest/net_pnl.parquet")
 
-    ## Performance metrics
     ann_return = net_pnl.mean() * 252
     ann_vol    = net_pnl.std() * np.sqrt(252)
     sharpe     = ann_return / ann_vol if ann_vol > 0 else 0
@@ -83,22 +81,24 @@ def build_portfolio(predictions: pd.Series,
     for k, v in metrics.items():
         print(f"  {k:<22} {v}")
 
-    ## Plot
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 7))
-
     cum_returns.plot(ax=ax1, color="steelblue", label="Strategy")
     ax1.set_title("Cumulative Returns")
     ax1.axhline(1, color="gray", linestyle="--", linewidth=0.7)
     ax1.legend()
 
-    roll_sharpe = (net_pnl.rolling(63).mean() /
-                   net_pnl.rolling(63).std() * np.sqrt(252))
+    roll_sharpe = (
+        net_pnl.rolling(63).mean() /
+        net_pnl.rolling(63).std() *
+        np.sqrt(252)
+    )
     roll_sharpe.plot(ax=ax2, color="darkorange")
     ax2.set_title("Rolling 63-day Sharpe")
     ax2.axhline(0, color="gray", linestyle="--", linewidth=0.7)
 
     plt.tight_layout()
     plt.savefig("backtest/results.png", dpi=150)
-    print("\nChart saved to backtest/results.png")
+    plt.close()
+    print("Chart saved to backtest/results.png")
 
     return metrics, net_pnl, cum_returns

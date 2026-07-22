@@ -292,11 +292,11 @@ def volatility_ratio(prices):
 def downside_volatility(prices):
     ret = prices.pct_change()
 
-    downside = ret.where(ret < 0)
+    downside = ret.clip(upper=0)
 
     raw = (
         -downside
-        .rolling(20)
+        .rolling(20, min_periods=10)
         .std()
         .shift(1)
     )

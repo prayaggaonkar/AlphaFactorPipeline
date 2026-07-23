@@ -27,11 +27,11 @@ def build_portfolio(predictions, daily_returns):
         if date in rebal_dates:
             sig = predictions.xs(date, level="date").dropna()
 
-            q20 = sig.quantile(0.20)
-            q80 = sig.quantile(0.80)
+            qLow = sig.quantile(0.10)
+            qHigh = sig.quantile(0.90)
 
-            longs = sig[sig >= q80].index
-            shorts = sig[sig <= q20].index
+            longs = sig[sig >= qHigh].index
+            shorts = sig[sig <= qLow].index
 
             current_weights[:] = 0.0
 

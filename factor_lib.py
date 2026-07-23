@@ -94,6 +94,31 @@ def breakout_52w(prices):
 # ── Build Factor Matrix ───────────────────────────────────────────
 
 def build_factor_matrix(prices, volume=None):
+
+    '''
+    factors = {
+        # Momentum
+        "mom_1m":        momentum_1m(prices),
+        "mom_3m":        momentum_3m(prices),
+        "mom_6m":        momentum_6m(prices),
+        "mom_12_1":      momentum_12_1(prices),
+
+        # Mean reversion
+        "rev_10d":       reversal_10d(prices),
+        "ma20_dist":     distance_ma(prices, 20),
+        "ma50_dist":     distance_ma(prices, 50),
+        "rsi":           rsi(prices),
+        "bollinger":     bollinger_zscore(prices),
+
+        # Volatility
+        "realized_vol":  realized_vol(prices),
+        "vol_ratio":     volatility_ratio(prices),
+
+        # Trend
+        "breakout_52w":  breakout_52w(prices),
+    }
+
+    '''
     factors = {
         "realized_vol": realized_vol(prices),
         "ma50_dist":    distance_ma(prices, 50),
@@ -102,6 +127,7 @@ def build_factor_matrix(prices, volume=None):
         "bollinger":    bollinger_zscore(prices),
         "rev_10d":      reversal_10d(prices),
     }
+    
 
     panels = []
     for name, df in factors.items():

@@ -27,8 +27,8 @@ def build_portfolio(predictions, daily_returns):
         if date in rebal_dates:
             sig = predictions.xs(date, level="date").dropna()
 
-            qLow = sig.quantile(0.10)
-            qHigh = sig.quantile(0.90)
+            qLow = sig.quantile(0.20)
+            qHigh = sig.quantile(0.80)
 
             longs = sig[sig >= qHigh].index
             shorts = sig[sig <= qLow].index
@@ -39,18 +39,12 @@ def build_portfolio(predictions, daily_returns):
             valid_shorts = [x for x in shorts if x in daily_returns.columns]
 
             if valid_longs:
-                ranks = sig.loc[valid_longs].rank()
-                rank_weights = ranks / ranks.sum()
-                current_weights.loc[valid_longs] = 0.5 * rank_weights
+                current_weights.loc[valid_longs] = 0.5 / len(valid_longs)
 
             if valid_shorts:
-                ranks = sig.loc[valid_shorts].rank(ascending=False)
-                rank_weights = ranks / ranks.sum()
-                current_weights.loc[valid_shorts] = -0.5 * rank_weights
+                current_weights.loc[valid_shorts] = -0.5 / len(valid_shorts)
 
-        weights.loc[date, current_weights.index] = current_weights.values
-
-    weights = weights.shift(1).fillna(0.0)
+        weights.loc[date] = current_weights
 
     gross_returns = (weights * daily_returns).sum(axis=1)
 

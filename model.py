@@ -66,7 +66,7 @@ def train_and_evaluate(factor_matrix: pd.DataFrame,
 
     for i in range(TRAIN_WINDOW, len(dates) - TEST_WINDOW, 21):
         train_dates = dates[i - TRAIN_WINDOW: i]
-        test_dates = dates[i:i+TEST_WINDOW] #dates[i + FORWARD_DAYS: i + FORWARD_DAYS + TEST_WINDOW]
+        test_dates = dates[i:i+TEST_WINDOW]
 
         if len(test_dates) == 0:
             continue
@@ -99,6 +99,9 @@ def train_and_evaluate(factor_matrix: pd.DataFrame,
         raise ValueError(f"No folds generated. Have {len(dates)} dates, need > {TRAIN_WINDOW + TEST_WINDOW}.")
 
     all_preds = pd.concat(all_predictions)
+    all_preds = (all_preds.groupby(level=["date", "ticker"]).mean())
+
+
     mean_ic   = np.nanmean(ic_by_fold)
     icir      = mean_ic / np.nanstd(ic_by_fold) if np.nanstd(ic_by_fold) > 0 else 0
 

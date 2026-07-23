@@ -66,7 +66,7 @@ def train_and_evaluate(factor_matrix: pd.DataFrame,
 
     for i in range(TRAIN_WINDOW, len(dates) - TEST_WINDOW, 21):
         train_dates = dates[i - TRAIN_WINDOW: i]
-        test_dates  = dates[i + FORWARD_DAYS: i + FORWARD_DAYS + TEST_WINDOW]
+        test_dates  = test_dates = dates[i:i+TEST_WINDOW] #dates[i + FORWARD_DAYS: i + FORWARD_DAYS + TEST_WINDOW]
 
         if len(test_dates) == 0:
             continue

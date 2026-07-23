@@ -154,19 +154,14 @@ def build_portfolio(predictions, daily_returns):
             valid_shorts = [x for x in shorts if x in daily_returns.columns]
 
             if valid_longs:
-                long_scores = sig.loc[valid_longs]
-                long_scores = long_scores - long_scores.min() + 1e-6
-
-                long_weights = (long_scores / long_scores.sum())
-                current_weights.loc[valid_longs] = (0.5 * long_weights)
+                ranks = sig.loc[valid_longs].rank()
+                weights = ranks / ranks.sum()
+                current_weights.loc[valid_longs] = 0.5 * weights
 
             if valid_shorts:
-                short_scores = sig.loc[valid_shorts]
-                short_scores = short_scores.max() - short_scores + 1e-6
-
-                short_weights = (short_scores / short_scores.sum())
-
-                current_weights.loc[valid_shorts] = (-0.5 * short_weights)
+                ranks = sig.loc[valid_shorts].rank(ascending=False)
+                weights = ranks / ranks.sum()
+                current_weights.loc[valid_shorts] = -0.5 * weights
 
         weights.loc[date] = current_weights
 
@@ -181,10 +176,10 @@ def build_portfolio(predictions, daily_returns):
 
     active_returns = net_returns[weights.abs().sum(axis=1) > 0]
 
-    TARGET_VOL = 0.15
-    realized_vol = ( active_returns.std() * np.sqrt(252))
-    scaling_factor = TARGET_VOL / realized_vol
-    active_returns = active_returns * scaling_factor
+    #TARGET_VOL = 0.15
+    #realized_vol = ( active_returns.std() * np.sqrt(252))
+    #scaling_factor = TARGET_VOL / realized_vol
+    #active_returns = active_returns * scaling_factor
 
     cumulative = (1 + active_returns).cumprod()
 

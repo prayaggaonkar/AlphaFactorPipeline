@@ -64,7 +64,7 @@ def download_prices():
         except Exception as e:
             print(f"  ✗ batch failed: {e}")
 
-        time.sleep(10)  # 10s between batches
+        time.sleep(5)  # 5s between batches
 
     if not all_series:
         raise ValueError("No data downloaded. Try running: ulimit -n 10000 first.")

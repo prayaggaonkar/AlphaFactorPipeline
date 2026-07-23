@@ -73,6 +73,12 @@ def build_portfolio(predictions, daily_returns):
 
     drawdown = cumulative / cumulative.cummax() - 1
 
+    print("Prediction start:", predictions.index.get_level_values("date").min())
+    print("Prediction end:", predictions.index.get_level_values("date").max())
+
+    print("Return data start:", daily_returns.index.min())
+    print("Return data end:", daily_returns.index.max())
+
     metrics = {
         "annualized_return": round(annual_return * 100, 2),
         "annualized_vol": round(annual_vol * 100, 2),

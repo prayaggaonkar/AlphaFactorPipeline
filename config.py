@@ -1,6 +1,6 @@
 UNIVERSE_SIZE = 150
 START_DATE    = "2021-01-01"
-END_DATE      = "2024-01-01"
+END_DATE      = "2025-01-01"
 FORWARD_DAYS  = 21        # predict 1-month returns
 REBAL_FREQ    = 10        # rebalance monthly
 TRAIN_WINDOW  = 252       # 1 years training

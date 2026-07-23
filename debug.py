@@ -1,55 +1,187 @@
-# debug_factors.py
-from data_loader import load_prices, compute_returns
-from factor_lib import *
-from scipy.stats import spearmanr
 import pandas as pd
 import numpy as np
+import lightgbm as lgb
+
+from model import information_coefficient
+from backtest import build_portfolio
+from data_loader import load_prices
+from factor_lib import build_factor_matrix
+from config import *
+
+
+# ─────────────────────────────────────────────
+# Load data
+# ─────────────────────────────────────────────
 
 prices = load_prices()
-daily_ret, fwd_ret = compute_returns(prices)
 
-factors = {
-    "mom_1m":        momentum_1m(prices),
-    "mom_3m":        momentum_3m(prices),
-    "mom_6m":        momentum_6m(prices),
-    "mom_12_1":      momentum_12_1(prices),
-    "rev_5d":        reversal_5d(prices),
-    "rev_10d":       reversal_10d(prices),
-    "ma20_dist":     distance_ma(prices, 20),
-    "ma50_dist":     distance_ma(prices, 50),
-    "rsi":           rsi(prices),
-    "bollinger":     bollinger_zscore(prices),
-    "realized_vol":  realized_vol(prices),
-    "breakout":      breakout_52w(prices),
-}
+factor_matrix = build_factor_matrix(prices)
 
-print(f"Forward return period: {FORWARD_DAYS} days")
-print(f"{'Factor':<20} {'Mean IC':>10} {'ICIR':>10} {'Positive%':>12}")
-print("-" * 56)
+# Forward returns target
+fwd_returns = (
+    prices
+    .pct_change(FORWARD_DAYS)
+    .shift(-FORWARD_DAYS)
+)
 
-results = {}
-for name, factor in factors.items():
-    ics = []
-    for date in factor.index[252::5]:
-        f = factor.loc[date].dropna()
-        if date not in fwd_ret.index:
-            continue
-        r = fwd_ret.loc[date].dropna()
-        common = f.index.intersection(r.index)
-        if len(common) < 20:
-            continue
-        ic, _ = spearmanr(f[common], r[common])
-        ics.append(ic)
-    ics = pd.Series(ics).dropna()
-    if len(ics) == 0:
-        print(f"{name:<20} {'no data':>10}")
+fwd_returns = fwd_returns.loc[factor_matrix.index
+                              .get_level_values("date")
+                              .unique()]
+
+
+target = fwd_returns.stack(future_stack=True)
+target.index.names = ["date", "ticker"]
+target.name = "target"
+
+
+data = factor_matrix.join(target, how="inner").dropna()
+
+
+print("\nFull dataset:")
+print(data.index.get_level_values("date").min(),
+      "→",
+      data.index.get_level_values("date").max())
+
+
+# ─────────────────────────────────────────────
+# Train / test split
+# ─────────────────────────────────────────────
+
+TEST_START = pd.Timestamp("2024-01-01")
+
+
+dates = (
+    data.index
+    .get_level_values("date")
+    .unique()
+    .sort_values()
+)
+
+
+feature_cols = [
+    c for c in data.columns
+    if c != "target"
+]
+
+
+# ─────────────────────────────────────────────
+# Walk-forward 2024
+# ─────────────────────────────────────────────
+
+predictions = []
+
+
+model = lgb.LGBMRegressor(
+    n_estimators=300,
+    learning_rate=0.02,
+    num_leaves=31,
+    min_child_samples=50,
+    reg_lambda=1.0,
+    reg_alpha=0.1,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    random_state=42,
+    verbose=-1
+)
+
+
+test_dates = dates[dates >= TEST_START]
+
+
+for i, date in enumerate(test_dates):
+
+    # only train using data before this date
+    train_dates = dates[dates < date]
+
+    train = data[
+        data.index.get_level_values("date")
+        .isin(train_dates)
+    ]
+
+
+    # predict next rebalance period
+    future_dates = test_dates[i:i+FORWARD_DAYS]
+
+
+    test = data[
+        data.index.get_level_values("date")
+        .isin(future_dates)
+    ]
+
+
+    if len(train) < 500 or len(test) < 50:
         continue
-    mean_ic = ics.mean()
-    icir = mean_ic / ics.std() if ics.std() > 0 else 0
-    pos = (ics > 0).mean() * 100
-    results[name] = mean_ic
-    print(f"{name:<20} {mean_ic:>10.4f} {icir:>10.2f} {pos:>11.1f}%")
 
-print("\n── Top positive factors ──")
-for name, ic in sorted(results.items(), key=lambda x: x[1], reverse=True)[:5]:
-    print(f"  {name}: {ic:.4f}")
+
+    X_train = train[feature_cols]
+    y_train = train["target"]
+
+    X_test = test[feature_cols]
+
+
+    model.fit(
+        X_train,
+        y_train
+    )
+
+
+    preds = pd.Series(
+        model.predict(X_test),
+        index=X_test.index,
+        name="prediction"
+    )
+
+
+    predictions.append(preds)
+
+    print(
+        f"Trained through {date.date()} | "
+        f"Predicted {future_dates[0].date()} → {future_dates[-1].date()}"
+    )
+
+
+# combine all predictions
+
+predictions = pd.concat(predictions)
+
+
+print("\nPredictions:")
+print(
+    predictions.index.get_level_values("date").min(),
+    "→",
+    predictions.index.get_level_values("date").max()
+)
+
+
+# ─────────────────────────────────────────────
+# IC on unseen 2024
+# ─────────────────────────────────────────────
+
+actual = data["target"]
+
+ic = information_coefficient(
+    predictions,
+    actual
+)
+
+print(f"\n2024 Mean IC: {ic:.4f}")
+
+
+# ─────────────────────────────────────────────
+# Backtest
+# ─────────────────────────────────────────────
+
+daily_returns = prices.pct_change()
+
+daily_returns = daily_returns.loc["2024-01-01":]
+
+
+metrics, returns, cumulative = build_portfolio(
+    predictions,
+    daily_returns
+)
+
+
+print("\n2024 OUT-OF-SAMPLE RESULTS")
+for k,v in metrics.items():
+    print(f"{k:<20}: {v}")

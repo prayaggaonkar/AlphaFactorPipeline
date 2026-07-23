@@ -42,9 +42,9 @@ def build_portfolio(predictions, daily_returns):
         valid_shorts = [t for t in shorts if t in daily_returns.columns]
 
         if valid_longs:
-            w[valid_longs]  =  0.5 / len(valid_longs)
+            w[valid_longs]  =  1.0 / len(valid_longs)
         if valid_shorts:
-            w[valid_shorts] = -0.5 / len(valid_shorts)
+            w[valid_shorts] = -1.0 / len(valid_shorts)
 
         idx_pos = daily_returns.index.get_loc(date)
         end_pos = min(idx_pos + REBAL_FREQ, len(daily_returns))
@@ -64,14 +64,14 @@ def build_portfolio(predictions, daily_returns):
     active = weight_df.abs().sum(axis=1) > 0
     net_pnl_active = net_pnl[active]
 
-    cum_returns = (1 + net_pnl).cumprod()
+    cum_returns = (1 + net_pnl_active).cumprod()
 
     os.makedirs("backtest", exist_ok=True)
     cum_returns.to_frame("cum_returns").to_parquet("backtest/cum_returns.parquet")
     net_pnl.to_frame("net_pnl").to_parquet("backtest/net_pnl.parquet")
 
     # Compute metrics on active days only
-    ann_return = net_pnl_active.mean() * 252
+    ann_return = ((1 + net_pnl_active).prod() **(252 / len(net_pnl_active))- 1)
     ann_vol    = net_pnl_active.std() * np.sqrt(252)
     sharpe     = ann_return / ann_vol if ann_vol > 0 else 0
     max_dd     = (cum_returns / cum_returns.cummax() - 1).min()

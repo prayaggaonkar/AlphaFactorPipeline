@@ -94,31 +94,13 @@ def breakout_52w(prices):
 # ── Build Factor Matrix ───────────────────────────────────────────
 
 def build_factor_matrix(prices, volume=None):
-    """
-    Only include factors with confirmed positive IC from debug_factors.py.
-    After running debug, comment out any factor with negative Mean IC.
-    """
     factors = {
-        # Mean reversion — confirmed positive IC
-        "ma20_dist":    distance_ma(prices, 20),
+        "realized_vol": realized_vol(prices),
         "ma50_dist":    distance_ma(prices, 50),
         "rsi":          rsi(prices),
+        "ma20_dist":    distance_ma(prices, 20),
         "bollinger":    bollinger_zscore(prices),
-        "rev_5d":       reversal_5d(prices),
         "rev_10d":      reversal_10d(prices),
-
-        # Volatility — high vol was positive signal
-        "realized_vol": realized_vol(prices),
-        "vol_ratio":    volatility_ratio(prices),
-
-        # Momentum — include but let LightGBM decide weight
-        "mom_1m":       momentum_1m(prices),
-        "mom_3m":       momentum_3m(prices),
-        "mom_6m":       momentum_6m(prices),
-        "mom_12_1":     momentum_12_1(prices),
-
-        # Price structure
-        "breakout":     breakout_52w(prices),
     }
 
     panels = []

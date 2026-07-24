@@ -7,8 +7,7 @@ from plotly.subplots import make_subplots
 import os
 
 st.set_page_config(
-    page_title="Alpha Factor Discovery Engine",
-    page_icon="📈",
+    page_title="Alpha Factor Discovery",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -402,29 +401,28 @@ st.markdown("""
         <div class="hero-author">Prayag Gaonkar</div>
     </div>
     <div class="hero-eyebrow">Quantitative Research · Machine Learning · Stock Markets</div>
-    <div class="hero-title">Alpha Factor<br><em>Discovery Engine</em></div>
+    <div class="hero-title">Alpha Factor<br><em>Discovery</em></div>
     <div class="hero-body">
-        A machine learning system that learns which stock characteristics predict 
-        future returns — and turns those predictions into a real, dollar-neutral trading strategy.
-        Built with walk-forward validation, SHAP explainability, and realistic transaction cost modeling.
-        Every number on this page is out-of-sample.
+        An end-to-end machine learning pipeline that learns which stock characteristics best predict future returns, ultimately constructing a robust trading strategy. 
+        Built with walk-forward validation, SHAP explainability, and realistic transaction cost modeling. 
     </div>
     <details class="hero-more">
         <summary>More about this project</summary>
         <div class="hero-more-content">
-            <strong>The core idea:</strong> Every day, some stocks go up more than others. Can we predict which ones?
-            This project builds a machine learning pipeline that studies patterns in historical stock data — 
-            things like whether a stock is trading below its recent average, or whether it's been unusually volatile — 
-            and learns to predict which stocks will outperform over the next month.
+            <strong>Overview:</strong> The stock market is notoriously random. Every day, some stocks skyrocket while others plummet.
+            This project is a machine learning pipeline that extracts patterns in historical stock data (ie.
+            whether a stock is trading below its recent average, or whether it's been unusually volatile)
+            to turn randomness into predictability.
             <br><br>
-            <strong>How it makes money:</strong> Each month, it <em>buys</em> the stocks the model ranks highest 
-            and simultaneously <em>bets against</em> the stocks it ranks lowest, in equal dollar amounts. 
-            This structure means the strategy doesn't care whether the overall market goes up or down — 
-            it only needs its top picks to beat its bottom picks.
+            <strong>How It Earns Money:</strong> Each month, the system buys stocks that the model ranks highest
+            while simultaneously betting against the stocks it ranks lowest. This structure means the strategy can lead to earnings 
+            regardless of whether the overall market goes up or down.
             <br><br>
-            <strong>Why it's hard to cheat:</strong> The model is evaluated using walk-forward validation — 
-            it only ever trains on past data and is tested on future data it has never seen. 
-            Every number on this page is a genuine out-of-sample result.
+            <strong>Technical Details:</strong> The LightGBM model is trained with factors including 
+            momentum, mean reversion, and volatility. The gradient boosting nature of the model enables large amounts of data
+            processing which reveal subtle patterns. Model predictions are continuously evaluated through a walk-forward framework, where the system is 
+            retrained on new data and tested on unseen periods. The resulting signals are converted into a portfolio and analyzed through rigorous backtesting using 
+            metrics such as Information Coefficient (IC), Sharpe ratio, annualized return, maximum drawdown, and transaction costs.
         </div>
     </details>
 </div>
@@ -448,7 +446,7 @@ calmar   = ann_ret / abs(max_dd) if max_dd != 0 else 0
 st.markdown("""
 <div class="sec-head" style="margin-top:16px;">
     <div class="sec-title">Key Results</div>
-    <div class="sec-sub">All metrics are out-of-sample · after transaction costs</div>
+    <div class="sec-sub">All metrics are out-of-sample · After transaction costs</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -459,7 +457,7 @@ dd_cls  = "neg" if max_dd < -8 else "neu"
 
 with c1: st.markdown(mcard("Annual Return", f"{ann_ret:+.1f}%", "Annualized return on active trading days, after all costs.", ret_cls), unsafe_allow_html=True)
 with c2: st.markdown(mcard("Sharpe Ratio", f"{sharpe:.2f}", "Return per unit of risk, annualized. Sharpe = (R̄ − Rf) / σ", shr_cls), unsafe_allow_html=True)
-with c3: st.markdown(mcard("Model IC", "0.034", "How well the model ranks stocks. >0.02 is industry standard.", "pos"), unsafe_allow_html=True)
+with c3: st.markdown(mcard("Model Information Coefficient", "0.034", "How well the model ranks stocks. >0.02 is industry standard.", "pos"), unsafe_allow_html=True)
 with c4: st.markdown(mcard("ICIR", "0.83", "Consistency of predictions across market conditions. >0.5 is good.", "pos"), unsafe_allow_html=True)
 with c5: st.markdown(mcard("Max Drawdown", f"{max_dd:.1f}%", "Worst peak-to-trough loss during the backtest.", dd_cls), unsafe_allow_html=True)
 with c6: st.markdown(mcard("Win Rate", f"{win_rate:.1f}%", "Percentage of active trading days with positive P&L.", "neu"), unsafe_allow_html=True)
@@ -481,7 +479,7 @@ st.markdown("""
 st.markdown("""
 <div class="sec-head">
     <div class="sec-title">Cumulative Returns</div>
-    <div class="sec-sub">Starting NAV = $1.00 · Long-short · After transaction costs</div>
+    <div class="sec-sub">Starting NAV = $1.00 · After transaction costs</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -599,8 +597,8 @@ with col_r:
 # Flow chart
 st.markdown("""
 <div class="sec-head">
-    <div class="sec-title">How It Works</div>
-    <div class="sec-sub">From raw market data to a live long-short portfolio</div>
+    <div class="sec-title">Pipeline Architecture</div>
+    <div class="sec-sub">Transforming Raw Market Data to a Long-Short Portfolio</div>
 </div>
 <div class="flowchart">
     <div class="flow-box flow-box-active">
@@ -628,7 +626,7 @@ st.markdown("""
     <div class="flow-box">
         <div class="flow-icon">🤖</div>
         <div class="flow-label">LightGBM Model</div>
-        <div class="flow-sub">Learns which signals<br>matter most · walk-forward</div>
+        <div class="flow-sub">Learns which signals<br>matter most · Walk-forward</div>
     </div>
     <div class="flow-arrow">
         <div class="flow-arrow-inner">
@@ -650,7 +648,7 @@ st.markdown("""
     <div class="flow-box flow-box-active">
         <div class="flow-icon">✅</div>
         <div class="flow-label">Results</div>
-        <div class="flow-sub">IC = 0.034 · ICIR = 0.83<br>out-of-sample</div>
+        <div class="flow-sub">IC = 0.034 · ICIR = 0.83<br>Out-of-sample</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -775,7 +773,6 @@ st.plotly_chart(fig_shap, use_container_width=True)
 st.markdown("""
 <div class="sec-head">
     <div class="sec-title">Full Statistics</div>
-    <div class="sec-sub">For quantitative researchers and technical recruiters</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -806,7 +803,7 @@ with col2:
 
 with col3:
     st.markdown(stat_table([
-        ("Model IC",              "0.0343",              "#34d399"),
+        ("Model Information Coefficient",              "0.0343",              "#34d399"),
         ("ICIR",                  "0.83",                "#34d399"),
         ("Universe",              "~100 S&P 500",        "#94a3b8"),
         ("Backtest Period",       "2022–2024",           "#94a3b8"),
@@ -818,7 +815,7 @@ with col3:
 st.markdown("""
 <div class="sec-head">
     <div class="sec-title">Technical Specification</div>
-    <div class="sec-sub">Model hyperparameters and backtest parameters</div>
+    <div class="sec-sub">Model Hyperparameters and Backtest Parameters</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -858,7 +855,7 @@ with col_b:
 
 st.markdown("""
 <div class="footer">
-    Alpha Factor Discovery Engine &nbsp;·&nbsp;
+    Alpha Factor Discovery &nbsp;·&nbsp;
     Copyright 2026 Prayag Gaonkar. All rights reserved.
 </div>
 """, unsafe_allow_html=True)

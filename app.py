@@ -19,6 +19,7 @@ st.markdown("""
 
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .stApp { background: #080c14; color: #cbd5e1; }
+.block-container { padding-top: 2.2rem !important; }
 section[data-testid="stSidebar"] { display: none; }
 #MainMenu, footer, header { visibility: hidden; }
 
@@ -27,7 +28,7 @@ section[data-testid="stSidebar"] { display: none; }
     border: 1px solid #162035;
     border-radius: 20px;
     padding: 60px 52px 52px;
-    margin-bottom: 48px;
+    margin-bottom: 20px;
     position: relative;
     overflow: hidden;
 }
@@ -85,6 +86,7 @@ section[data-testid="stSidebar"] { display: none; }
     background: rgba(56,189,248,0.04);
     transition: background 0.15s ease, border-color 0.15s ease;
     width: fit-content;
+    outline: none;
 }
 .hero-more summary:hover {
     background: rgba(56,189,248,0.09);
@@ -121,7 +123,7 @@ section[data-testid="stSidebar"] { display: none; }
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
+    gap: 18px;
 }
 .hero-github {
     display: inline-flex;
@@ -143,10 +145,10 @@ section[data-testid="stSidebar"] { display: none; }
 .hero-github svg { width: 15px; height: 15px; fill: #38bdf8; }
 .hero-author {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    color: #94a3b8;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #e2e8f0;
     padding-right: 2px;
 }
 
@@ -168,12 +170,16 @@ section[data-testid="stSidebar"] { display: none; }
     background: rgba(56,189,248,0.04);
     transition: background 0.15s ease, border-color 0.15s ease;
     width: fit-content;
+    outline: none;
 }
 .info-details summary:hover {
     background: rgba(56,189,248,0.09);
     border-color: #38bdf8;
 }
 .info-details summary::-webkit-details-marker { display: none; }
+.info-details summary::marker { content: ""; display: none; }
+.hero-more summary::-webkit-details-marker { display: none; }
+.hero-more summary::marker { content: ""; display: none; }
 .info-details summary::after {
     content: '+';
     font-size: 15px;
@@ -440,7 +446,7 @@ calmar   = ann_ret / abs(max_dd) if max_dd != 0 else 0
 
 # ── KEY RESULTS ───────────────────────────────────────────────────────────────
 st.markdown("""
-<div class="sec-head">
+<div class="sec-head" style="margin-top:16px;">
     <div class="sec-title">Key Results</div>
     <div class="sec-sub">All metrics are out-of-sample · after transaction costs</div>
 </div>
@@ -504,61 +510,6 @@ fig_nav.update_layout(
     showlegend=False, hovermode="x unified"
 )
 st.plotly_chart(fig_nav, use_container_width=True)
-
-# Flow chart
-st.markdown("""
-<div class="flowchart">
-    <div class="flow-box flow-box-active">
-        <div class="flow-icon">📥</div>
-        <div class="flow-label">Market Data</div>
-        <div class="flow-sub">~100 S&P 500 stocks<br>daily prices 2021–2024</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box">
-        <div class="flow-icon">🔬</div>
-        <div class="flow-label">Factor Engineering</div>
-        <div class="flow-sub">6 predictive signals<br>computed per stock per day</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box">
-        <div class="flow-icon">🤖</div>
-        <div class="flow-label">LightGBM Model</div>
-        <div class="flow-sub">Learns which signals<br>matter most · walk-forward</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box">
-        <div class="flow-icon">📊</div>
-        <div class="flow-label">Long-Short Portfolio</div>
-        <div class="flow-sub">Long top 20%<br>Short bottom 20%</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box flow-box-active">
-        <div class="flow-icon">✅</div>
-        <div class="flow-label">Results</div>
-        <div class="flow-sub">IC = 0.034 · ICIR = 0.83<br>out-of-sample</div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
 
 
 # ── PERFORMANCE CHARTS ────────────────────────────────────────────────────────
@@ -644,6 +595,65 @@ with col_r:
         showlegend=False
     )
     st.plotly_chart(fig_rs, use_container_width=True)
+
+# Flow chart
+st.markdown("""
+<div class="sec-head">
+    <div class="sec-title">How It Works</div>
+    <div class="sec-sub">From raw market data to a live long-short portfolio</div>
+</div>
+<div class="flowchart">
+    <div class="flow-box flow-box-active">
+        <div class="flow-icon">📥</div>
+        <div class="flow-label">Market Data</div>
+        <div class="flow-sub">~100 S&P 500 stocks<br>daily prices 2021–2024</div>
+    </div>
+    <div class="flow-arrow">
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
+    </div>
+    <div class="flow-box">
+        <div class="flow-icon">🔬</div>
+        <div class="flow-label">Factor Engineering</div>
+        <div class="flow-sub">6 predictive signals<br>computed per stock per day</div>
+    </div>
+    <div class="flow-arrow">
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
+    </div>
+    <div class="flow-box">
+        <div class="flow-icon">🤖</div>
+        <div class="flow-label">LightGBM Model</div>
+        <div class="flow-sub">Learns which signals<br>matter most · walk-forward</div>
+    </div>
+    <div class="flow-arrow">
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
+    </div>
+    <div class="flow-box">
+        <div class="flow-icon">📊</div>
+        <div class="flow-label">Long-Short Portfolio</div>
+        <div class="flow-sub">Long top 20%<br>Short bottom 20%</div>
+    </div>
+    <div class="flow-arrow">
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
+    </div>
+    <div class="flow-box flow-box-active">
+        <div class="flow-icon">✅</div>
+        <div class="flow-label">Results</div>
+        <div class="flow-sub">IC = 0.034 · ICIR = 0.83<br>out-of-sample</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 
 # ── FACTOR ANALYSIS ───────────────────────────────────────────────────────────

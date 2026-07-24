@@ -602,6 +602,9 @@ st.plotly_chart(fig_nav, use_container_width=True)
 if "show_perf_charts" not in st.session_state:
     st.session_state.show_perf_charts = True  # open by default
 
+def _toggle_perf_charts():
+    st.session_state.show_perf_charts = not st.session_state.show_perf_charts
+
 head_col, btn_col = st.columns([6, 1])
 with head_col:
     st.markdown("""
@@ -613,8 +616,7 @@ with head_col:
 with btn_col:
     st.markdown('<div style="margin-top:52px;"></div>', unsafe_allow_html=True)
     toggle_label = "− Collapse" if st.session_state.show_perf_charts else "+ Expand"
-    if st.button(toggle_label, key="toggle_perf_charts", use_container_width=True):
-        st.session_state.show_perf_charts = not st.session_state.show_perf_charts
+    st.button(toggle_label, key="toggle_perf_charts", on_click=_toggle_perf_charts, use_container_width=True)
 
 st.markdown('<div class="sec-head-divider"></div>', unsafe_allow_html=True)
 
@@ -716,7 +718,7 @@ factors = [
 
 max_ic = max(abs(f[3]) for f in factors)
 
-_factor_rows_html = ""
+_factor_row_parts = []
 for code, name, desc, ic, used in factors:
     bar_w  = int(abs(ic) / max_ic * 100)
     bar_c  = "#34d399" if used else "#f87171"
@@ -724,18 +726,15 @@ for code, name, desc, ic, used in factors:
     ic_str = f"+{ic:.4f}" if ic > 0 else f"{ic:.4f}"
     badge  = f'<span class="ft-badge" style="background:rgba(52,211,153,0.08);color:#34d399;border:1px solid rgba(52,211,153,0.2);">✓ used</span>' if used else \
              f'<span class="ft-badge" style="background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.2);">✗ excl.</span>'
-    _factor_rows_html += f"""
-    <div class="ftrow">
-        <div class="ft-name">{code}</div>
-        <div style="flex:1;">
-            <div style="font-size:12px;color:#94a3b8;font-weight:500;">{name}</div>
-            <div class="ft-desc">{desc}</div>
-        </div>
-        <div class="ft-bar-bg"><div class="ft-bar" style="width:{bar_w}%;background:{bar_c};"></div></div>
-        <div class="ft-ic" style="color:{ic_c};">IC {ic_str}</div>
-        {badge}
-    </div>
-    """
+    _factor_row_parts.append(
+        f'<div class="ftrow"><div class="ft-name">{code}</div>'
+        f'<div style="flex:1;"><div style="font-size:12px;color:#94a3b8;font-weight:500;">{name}</div>'
+        f'<div class="ft-desc">{desc}</div></div>'
+        f'<div class="ft-bar-bg"><div class="ft-bar" style="width:{bar_w}%;background:{bar_c};"></div></div>'
+        f'<div class="ft-ic" style="color:{ic_c};">IC {ic_str}</div>'
+        f'{badge}</div>'
+    )
+_factor_rows_html = "".join(_factor_row_parts)
 
 st.markdown(f'<div class="stattbl" style="padding:4px 0;">{_factor_rows_html}</div>', unsafe_allow_html=True)
 

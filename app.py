@@ -462,18 +462,6 @@ with c4: st.markdown(mcard("ICIR", "0.83", "Consistency of predictions across ma
 with c5: st.markdown(mcard("Max Drawdown", f"{max_dd:.1f}%", "Worst peak-to-trough loss during the backtest.", dd_cls), unsafe_allow_html=True)
 with c6: st.markdown(mcard("Win Rate", f"{win_rate:.1f}%", "Percentage of active trading days with positive P&L.", "neu"), unsafe_allow_html=True)
 
-st.markdown("""
-<details class="info-details" style="margin-top:20px;">
-    <summary>What IC means</summary>
-    <div class="exp">
-        IC (Information Coefficient) measures how well the model's stock rankings match actual future returns.
-        An IC of 0.034 means predictions are 3.4% correlated with real outcomes — small but consistent.
-        Professionally, IC > 0.02 is considered genuine, exploitable alpha.
-        An ICIR of 0.83 confirms the signal holds across different market periods, not just one lucky stretch.
-    </div>
-</details>
-""", unsafe_allow_html=True)
-
 
 # ── CUMULATIVE RETURNS ────────────────────────────────────────────────────────
 st.markdown("""

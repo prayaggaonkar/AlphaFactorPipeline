@@ -1,0 +1,38 @@
+yamlname: Keep Streamlit App Awake
+
+on:
+  schedule:
+    # Runs every 8 hours (at 00:00, 08:00, 16:00 UTC)
+    - cron: '0 */8 * * *'
+  workflow_dispatch: # Allows you to run this manually from GitHub
+
+jobs:
+  ping_app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Puppeteer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-node-version: '20'
+
+      - name: Install Puppeteer
+        run: npm install puppeteer
+
+      - name: Visit App with Headless Browser
+        run: |
+          node -e "
+          const puppeteer = require('puppeteer');
+          (async () => {
+            const browser = await puppeteer.launch({ headless: 'new' });
+            const page = await browser.newPage();
+            console.log('Visiting app...');
+            await page.goto('https://alphafactordiscovery.streamlit.app/', { waitUntil: 'networkidle2' });
+            console.log('App loaded successfully!');
+            await browser.close();
+          })();
+          "

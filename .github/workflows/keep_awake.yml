@@ -2,36 +2,35 @@ name: Keep Streamlit App Awake
 
 on:
   schedule:
-    # Runs every 8 hours (at 00:00, 08:00, 16:00 UTC)
     - cron: '0 */8 * * *'
-  workflow_dispatch: # Allows you to run this manually from GitHub
+  workflow_dispatch:
 
 jobs:
   ping_app:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Puppeteer dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgbm-dev
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24' # Uses the recommended Node 24 runtime
 
-      - name: Install Puppeteer
-        run: npm install puppeteer
+      - name: Install Puppeteer and Chrome
+        run: |
+          npm install puppeteer
+          npx puppeteer browsers install chrome
 
       - name: Visit App with Headless Browser
         run: |
           node -e "
           const puppeteer = require('puppeteer');
           (async () => {
-            const browser = await puppeteer.launch({ headless: 'new' });
+            const browser = await puppeteer.launch({ 
+              headless: true,
+              args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+            });
             const page = await browser.newPage();
             console.log('Visiting app...');
-            await page.goto('https://alphafactordiscovery.streamlit.app/', { waitUntil: 'networkidle2' });
+            await page.goto('https://alphafactordiscovery.streamlit.app/', { waitUntil: 'networkidle2', timeout: 60000 });
             console.log('App loaded successfully!');
             await browser.close();
           })();

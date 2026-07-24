@@ -662,20 +662,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<details class="info-details" style="margin-top:2px;">
-    <summary>What is a factor?</summary>
-    <div class="exp">
-        A factor is a number computed for each stock on each day.
-        For example, "Distance from 50-day Moving Average" tells us how far a stock's price has drifted 
-        from its recent average. Stocks far below their average tend to bounce back — that's mean reversion.
-        We measure each factor's predictive power with <strong>IC (Information Coefficient)</strong>: 
-        the correlation between our rankings and actual future returns.
-        IC > 0.02 is exploitable. We only feed the model factors with confirmed positive IC.
-    </div>
-</details>
-""", unsafe_allow_html=True)
-
 factors = [
     ("realized_vol", "Realized Volatility",       "High recent volatility predicts outperformance in our dataset",           0.033, True),
     ("ma50_dist",    "Distance from 50-day MA",   "Stocks below their 50-day average tend to mean-revert upward",            0.031, True),
@@ -718,18 +704,6 @@ st.markdown("""
     <div class="sec-title">SHAP Feature Importance</div>
     <div class="sec-sub">Which factors the model relied on most — averaged across all out-of-sample predictions</div>
 </div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<details class="info-details" style="margin-top:2px;">
-    <summary>What is SHAP?</summary>
-    <div class="exp">
-        Instead of a black-box model, SHAP lets us see exactly 
-        which factors drove each prediction. The chart below shows the average absolute contribution 
-        of each factor across all out-of-sample predictions — the longer the bar, the more that 
-        factor influenced the model's stock rankings.
-    </div>
-</details>
 """, unsafe_allow_html=True)
 
 shap_factors = ["realized_vol", "ma50_dist", "rsi", "ma20_dist", "bollinger", "rev_10d"]

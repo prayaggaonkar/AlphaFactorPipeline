@@ -403,8 +403,8 @@ section[data-testid="stSidebar"] { display: none; }
 @st.cache_data
 def load_results():
     try:
-        cum = pd.read_parquet("backtest/cum_returns.parquet")["cum_returns"]
-        pnl = pd.read_parquet("backtest/net_pnl.parquet")["net_pnl"]
+        cum = pd.read_parquet("Backtest/cum_returns.parquet")["cum_returns"]
+        pnl = pd.read_parquet("Backtest/net_pnl.parquet")["net_pnl"]
         return cum, pnl, True
     except Exception:
         return None, None, False

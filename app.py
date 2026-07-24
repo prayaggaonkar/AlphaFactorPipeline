@@ -64,7 +64,6 @@ section[data-testid="stSidebar"] { display: none; }
 }
 
 .hero-more {
-    max-width: 700px;
     margin-top: 18px;
     position: relative;
     z-index: 1;
@@ -105,18 +104,26 @@ section[data-testid="stSidebar"] { display: none; }
     font-size: 15px;
     color: #64748b;
     line-height: 1.8;
-    padding: 20px 24px;
+    padding: 24px 32px;
     background: rgba(5,10,20,0.4);
     border: 1px solid #131e30;
     border-radius: 12px;
+    width: 100%;
+    box-sizing: border-box;
 }
 .hero-more-content strong { color: #e2e8f0; }
 
-.hero-github {
+.hero-github-wrap {
     position: absolute;
     top: 32px;
     right: 36px;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+.hero-github {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -134,6 +141,14 @@ section[data-testid="stSidebar"] { display: none; }
 }
 .hero-github:hover { background: rgba(56,189,248,0.09); border-color: #38bdf8; }
 .hero-github svg { width: 15px; height: 15px; fill: #38bdf8; }
+.hero-author {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: #94a3b8;
+    padding-right: 2px;
+}
 
 .info-details { margin: 16px 0; }
 .info-details summary {
@@ -177,7 +192,7 @@ section[data-testid="stSidebar"] { display: none; }
     border-bottom: 1px solid #111827;
 }
 .sec-title { font-size: 20px; font-weight: 600; color: #e2e8f0; }
-.sec-sub   { font-size: 13px; color: #334155; }
+.sec-sub   { font-size: 13px; color: #4a5872; }
 
 .mcard {
     background: #0b1120;
@@ -192,7 +207,7 @@ section[data-testid="stSidebar"] { display: none; }
 .mcard-label {
     font-size: 13.5px;
     font-weight: 600;
-    color: #64748b;
+    color: #4a5872;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 12px;
@@ -202,20 +217,13 @@ section[data-testid="stSidebar"] { display: none; }
     font-size: 38px;
     font-weight: 600;
     line-height: 1;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
 }
-.mcard-sub { font-size: 12px; color: #1e3a5f; line-height: 1.55; margin-top: auto; }
+.mcard-sub { font-size: 12px; color: #4a5872; line-height: 1.55; margin-top: auto; }
 .mcard-formula {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: #7dd3fc;
-    background: rgba(56,189,248,0.06);
-    border: 1px solid #14304a;
-    border-radius: 6px;
-    padding: 5px 9px;
-    display: inline-block;
-    margin-top: 8px;
-    letter-spacing: 0.01em;
+    font-size: 12px;
+    color: #4a5872;
+    margin-top: 4px;
 }
 .pos { color: #34d399; }
 .neg { color: #f87171; }
@@ -229,7 +237,7 @@ section[data-testid="stSidebar"] { display: none; }
     padding: 18px 22px;
     margin: 16px 0;
     font-size: 14px;
-    color: #64748b;
+    color: #4a5872;
     line-height: 1.8;
 }
 .exp strong { color: #e2e8f0; }
@@ -245,7 +253,7 @@ section[data-testid="stSidebar"] { display: none; }
 }
 .flow-box {
     background: #0b1120;
-    border: 1px solid #1e3a5f;
+    border: 1px solid #38bdf8;
     border-radius: 12px;
     padding: 20px 18px;
     text-align: center;
@@ -253,6 +261,7 @@ section[data-testid="stSidebar"] { display: none; }
     flex: 1;
     max-width: 180px;
     position: relative;
+    box-shadow: 0 0 20px rgba(56,189,248,0.08);
 }
 .flow-box-active {
     border-color: #38bdf8;
@@ -268,7 +277,7 @@ section[data-testid="stSidebar"] { display: none; }
 }
 .flow-sub {
     font-size: 11px;
-    color: #334155;
+    color: #4a5872;
     line-height: 1.5;
 }
 .flow-arrow {
@@ -305,7 +314,7 @@ section[data-testid="stSidebar"] { display: none; }
 }
 .ftrow:last-child { border-bottom: none; }
 .ft-name  { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #7dd3fc; min-width: 110px; }
-.ft-desc  { font-size: 12px; color: #334155; flex: 1; }
+.ft-desc  { font-size: 12px; color: #4a5872; flex: 1; }
 .ft-bar-bg { width: 100px; height: 5px; background: #111827; border-radius: 3px; flex-shrink: 0; }
 .ft-bar    { height: 100%; border-radius: 3px; }
 .ft-ic     { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; min-width: 64px; text-align: right; }
@@ -321,7 +330,7 @@ section[data-testid="stSidebar"] { display: none; }
     font-size: 13px;
 }
 .strow:last-child { border-bottom: none; }
-.strow-label { color: #334155; }
+.strow-label { color: #4a5872; }
 .strow-val   { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 13px; }
 
 .codebox {
@@ -331,7 +340,7 @@ section[data-testid="stSidebar"] { display: none; }
     padding: 18px 22px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-    color: #475569;
+    color: #4a5872;
     line-height: 2;
 }
 .codebox .key { color: #38bdf8; }
@@ -341,7 +350,7 @@ section[data-testid="stSidebar"] { display: none; }
     text-align: center;
     padding: 48px 0 24px;
     font-size: 12px;
-    color: #1e293b;
+    color: #4a5872;
     border-top: 1px solid #0f1724;
     margin-top: 72px;
 }
@@ -379,10 +388,13 @@ def stat_table(rows):
 # ── HERO ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-    <a class="hero-github" href="https://github.com/prayaggaonkar/AlphaFactorPipeline" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-        View on GitHub
-    </a>
+    <div class="hero-github-wrap">
+        <a class="hero-github" href="https://github.com/prayaggaonkar/AlphaFactorPipeline" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+            View on GitHub
+        </a>
+        <div class="hero-author">Prayag Gaonkar</div>
+    </div>
     <div class="hero-eyebrow">Quantitative Research · Machine Learning · Stock Markets</div>
     <div class="hero-title">Alpha Factor<br><em>Discovery Engine</em></div>
     <div class="hero-body">
@@ -425,6 +437,73 @@ max_dd   = ((cum_returns / cum_returns.cummax()) - 1).min() * 100
 win_rate = (active > 0).mean() * 100
 calmar   = ann_ret / abs(max_dd) if max_dd != 0 else 0
 
+
+# ── KEY RESULTS ───────────────────────────────────────────────────────────────
+st.markdown("""
+<div class="sec-head">
+    <div class="sec-title">Key Results</div>
+    <div class="sec-sub">All metrics are out-of-sample · after transaction costs</div>
+</div>
+""", unsafe_allow_html=True)
+
+c1, c2, c3, c4, c5, c6 = st.columns(6)
+ret_cls = "pos" if ann_ret > 0 else "neg"
+shr_cls = "pos" if sharpe > 0.3 else ("neg" if sharpe < 0 else "neu")
+dd_cls  = "neg" if max_dd < -8 else "neu"
+
+with c1: st.markdown(mcard("Annual Return", f"{ann_ret:+.1f}%", "Annualized return on active trading days, after all costs.", ret_cls), unsafe_allow_html=True)
+with c2: st.markdown(mcard("Sharpe Ratio", f"{sharpe:.2f}", "Return per unit of risk, annualized. Sharpe = (R̄ − Rf) / σ", shr_cls), unsafe_allow_html=True)
+with c3: st.markdown(mcard("Model IC", "0.034", "How well the model ranks stocks. >0.02 is industry standard.", "pos"), unsafe_allow_html=True)
+with c4: st.markdown(mcard("ICIR", "0.83", "Consistency of predictions across market conditions. >0.5 is good.", "pos"), unsafe_allow_html=True)
+with c5: st.markdown(mcard("Max Drawdown", f"{max_dd:.1f}%", "Worst peak-to-trough loss during the backtest.", dd_cls), unsafe_allow_html=True)
+with c6: st.markdown(mcard("Win Rate", f"{win_rate:.1f}%", "Percentage of active trading days with positive P&L.", "neu"), unsafe_allow_html=True)
+
+st.markdown("""
+<details class="info-details" style="margin-top:20px;">
+    <summary>What IC means</summary>
+    <div class="exp">
+        IC (Information Coefficient) measures how well the model's stock rankings match actual future returns.
+        An IC of 0.034 means predictions are 3.4% correlated with real outcomes — small but consistent.
+        Professionally, IC > 0.02 is considered genuine, exploitable alpha.
+        An ICIR of 0.83 confirms the signal holds across different market periods, not just one lucky stretch.
+    </div>
+</details>
+""", unsafe_allow_html=True)
+
+
+# ── CUMULATIVE RETURNS ────────────────────────────────────────────────────────
+st.markdown("""
+<div class="sec-head">
+    <div class="sec-title">Cumulative Returns</div>
+    <div class="sec-sub">Starting NAV = $1.00 · Long-short · After transaction costs</div>
+</div>
+""", unsafe_allow_html=True)
+
+fig_nav = go.Figure()
+fig_nav.add_trace(go.Scatter(
+    x=cum_returns.index, y=cum_returns.values,
+    mode="lines", name="Strategy NAV",
+    line=dict(color="#38bdf8", width=2),
+    fill="tozeroy", fillcolor="rgba(56,189,248,0.04)",
+    hovertemplate="Date: %{x|%Y-%m-%d}<br>NAV: $%{y:.4f}<extra></extra>"
+))
+fig_nav.add_hline(y=1.0, line_dash="dot", line_color="#1e2535", line_width=1)
+
+# Center the y-axis around 1.0 so NAV=1.0 sits at the visual midpoint
+_max_dev = max(abs(cum_returns.max() - 1.0), abs(cum_returns.min() - 1.0))
+_pad = _max_dev * 0.15 if _max_dev > 0 else 0.01
+_y_range = [1.0 - _max_dev - _pad, 1.0 + _max_dev + _pad]
+
+fig_nav.update_layout(
+    height=320,
+    margin=dict(l=0, r=0, t=10, b=0),
+    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+    xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=11)),
+    yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155",
+               tickfont=dict(size=11), tickformat=".4f", range=_y_range),
+    showlegend=False, hovermode="x unified"
+)
+st.plotly_chart(fig_nav, use_container_width=True)
 
 # Flow chart
 st.markdown("""
@@ -480,74 +559,6 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
-
-
-# ── KEY RESULTS ───────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="sec-head">
-    <div class="sec-title">Key Results</div>
-    <div class="sec-sub">All metrics are out-of-sample · after transaction costs</div>
-</div>
-""", unsafe_allow_html=True)
-
-c1, c2, c3, c4, c5, c6 = st.columns(6)
-ret_cls = "pos" if ann_ret > 0 else "neg"
-shr_cls = "pos" if sharpe > 0.3 else ("neg" if sharpe < 0 else "neu")
-dd_cls  = "neg" if max_dd < -8 else "neu"
-
-with c1: st.markdown(mcard("Model IC", "0.034", "How well the model ranks stocks. >0.02 is industry standard.", "pos"), unsafe_allow_html=True)
-with c2: st.markdown(mcard("ICIR", "0.83", "Consistency of predictions across market conditions. >0.5 is good.", "pos"), unsafe_allow_html=True)
-with c3: st.markdown(mcard("Ann. Return", f"{ann_ret:+.1f}%", "Annualized return on active trading days, after all costs.", ret_cls), unsafe_allow_html=True)
-with c4: st.markdown(mcard("Sharpe Ratio", f"{sharpe:.2f}", "Return per unit of risk, annualized.", shr_cls, formula="Sharpe = (R̄ − Rf) / σ"), unsafe_allow_html=True)
-with c5: st.markdown(mcard("Max Drawdown", f"{max_dd:.1f}%", "Worst peak-to-trough loss during the backtest.", dd_cls), unsafe_allow_html=True)
-with c6: st.markdown(mcard("Win Rate", f"{win_rate:.1f}%", "Percentage of active trading days with positive P&L.", "neu"), unsafe_allow_html=True)
-
-st.markdown("""
-<details class="info-details" style="margin-top:20px;">
-    <summary>What IC means</summary>
-    <div class="exp">
-        IC (Information Coefficient) measures how well the model's stock rankings match actual future returns.
-        An IC of 0.034 means predictions are 3.4% correlated with real outcomes — small but consistent.
-        Professionally, IC > 0.02 is considered genuine, exploitable alpha.
-        An ICIR of 0.83 confirms the signal holds across different market periods, not just one lucky stretch.
-    </div>
-</details>
-""", unsafe_allow_html=True)
-
-
-# ── CUMULATIVE RETURNS ────────────────────────────────────────────────────────
-st.markdown("""
-<div class="sec-head">
-    <div class="sec-title">Cumulative Returns</div>
-    <div class="sec-sub">Starting NAV = $1.00 · Long-short · After transaction costs</div>
-</div>
-""", unsafe_allow_html=True)
-
-fig_nav = go.Figure()
-fig_nav.add_trace(go.Scatter(
-    x=cum_returns.index, y=cum_returns.values,
-    mode="lines", name="Strategy NAV",
-    line=dict(color="#38bdf8", width=2),
-    fill="tozeroy", fillcolor="rgba(56,189,248,0.04)",
-    hovertemplate="Date: %{x|%Y-%m-%d}<br>NAV: $%{y:.4f}<extra></extra>"
-))
-fig_nav.add_hline(y=1.0, line_dash="dot", line_color="#1e2535", line_width=1)
-
-# Center the y-axis around 1.0 so NAV=1.0 sits at the visual midpoint
-_max_dev = max(abs(cum_returns.max() - 1.0), abs(cum_returns.min() - 1.0))
-_pad = _max_dev * 0.15 if _max_dev > 0 else 0.01
-_y_range = [1.0 - _max_dev - _pad, 1.0 + _max_dev + _pad]
-
-fig_nav.update_layout(
-    height=320,
-    margin=dict(l=0, r=0, t=10, b=0),
-    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=11)),
-    yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155",
-               tickfont=dict(size=11), tickformat=".4f", range=_y_range),
-    showlegend=False, hovermode="x unified"
-)
-st.plotly_chart(fig_nav, use_container_width=True)
 
 
 # ── PERFORMANCE CHARTS ────────────────────────────────────────────────────────
@@ -644,7 +655,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<details class="info-details">
+<details class="info-details" style="margin-top:2px;">
     <summary>What is a factor?</summary>
     <div class="exp">
         A factor is a number computed for each stock on each day.
@@ -702,7 +713,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<details class="info-details">
+<details class="info-details" style="margin-top:2px;">
     <summary>What is SHAP?</summary>
     <div class="exp">
         Instead of a black-box model, SHAP lets us see exactly 

@@ -359,6 +359,43 @@ section[data-testid="stSidebar"] { display: none; }
     border-top: 1px solid #0f1724;
     margin-top: 72px;
 }
+
+/* Section header row that pairs with a Streamlit button (e.g. collapse toggle) */
+.sec-head-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 52px 0 0;
+}
+.sec-head-row .sec-head-text { display: flex; align-items: baseline; gap: 14px; }
+.sec-head-divider {
+    border-bottom: 1px solid #111827;
+    margin: 14px 0 24px;
+}
+
+/* Match Streamlit buttons to the site's pill/button aesthetic */
+.stButton > button {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: #38bdf8;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    background: rgba(56,189,248,0.04);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.stButton > button:hover {
+    background: rgba(56,189,248,0.09);
+    border-color: #38bdf8;
+    color: #38bdf8;
+}
+.stButton > button:focus:not(:active) {
+    color: #38bdf8;
+    border-color: #38bdf8;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -423,6 +460,69 @@ st.markdown("""
             processing which reveal subtle patterns. Model predictions are continuously evaluated through a walk-forward framework, where the system is 
             retrained on new data and tested on unseen periods. The resulting signals are converted into a portfolio and analyzed through rigorous backtesting using 
             metrics such as Information Coefficient (IC), Sharpe ratio, annualized return, maximum drawdown, and transaction costs.
+            <br><br>
+            <strong>Pipeline Architecture:</strong> Raw market data is transformed into a long-short portfolio in five stages.
+            <div class="flowchart" style="margin-top:20px;">
+                <div class="flow-box flow-box-active">
+                    <div class="flow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v10H4z"/><path d="M4 14l3 6h10l3-6"/><circle cx="12" cy="9" r="2"/></svg>
+                    </div>
+                    <div class="flow-label">Market Data</div>
+                    <div class="flow-sub">~100 S&P 500 stocks<br>daily prices 2021–2024</div>
+                </div>
+                <div class="flow-arrow">
+                    <div class="flow-arrow-inner">
+                        <div class="flow-arrow-line"></div>
+                        <div class="flow-arrow-head"></div>
+                    </div>
+                </div>
+                <div class="flow-box">
+                    <div class="flow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h4"/><path d="M10 3v5.5L5 18a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9.5V3"/><path d="M7.5 14h9"/></svg>
+                    </div>
+                    <div class="flow-label">Factor Engineering</div>
+                    <div class="flow-sub">6 predictive signals<br>computed per stock per day</div>
+                </div>
+                <div class="flow-arrow">
+                    <div class="flow-arrow-inner">
+                        <div class="flow-arrow-line"></div>
+                        <div class="flow-arrow-head"></div>
+                    </div>
+                </div>
+                <div class="flow-box">
+                    <div class="flow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg>
+                    </div>
+                    <div class="flow-label">LightGBM Model</div>
+                    <div class="flow-sub">Learns which signals<br>matter most · Walk-forward</div>
+                </div>
+                <div class="flow-arrow">
+                    <div class="flow-arrow-inner">
+                        <div class="flow-arrow-line"></div>
+                        <div class="flow-arrow-head"></div>
+                    </div>
+                </div>
+                <div class="flow-box">
+                    <div class="flow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+                    </div>
+                    <div class="flow-label">Long-Short Portfolio</div>
+                    <div class="flow-sub">Long top 20%<br>Short bottom 20%</div>
+                </div>
+                <div class="flow-arrow">
+                    <div class="flow-arrow-inner">
+                        <div class="flow-arrow-line"></div>
+                        <div class="flow-arrow-head"></div>
+                    </div>
+                </div>
+                <div class="flow-box flow-box-active">
+                    <div class="flow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9"/></svg>
+                    </div>
+                    <div class="flow-label">Results</div>
+                    <div class="flow-sub">IC = 0.034 · ICIR = 0.83<br>Out-of-sample</div>
+                </div>
+            </div>
         </div>
     </details>
 </div>
@@ -499,148 +599,101 @@ st.plotly_chart(fig_nav, use_container_width=True)
 
 
 # ── PERFORMANCE CHARTS ────────────────────────────────────────────────────────
-st.markdown("""
-<div class="sec-head">
-    <div class="sec-title">Performance Analysis</div>
-    <div class="sec-sub">Daily P&L · Drawdown · Rolling Sharpe · Return Distribution</div>
-</div>
-""", unsafe_allow_html=True)
+if "show_perf_charts" not in st.session_state:
+    st.session_state.show_perf_charts = True  # open by default
 
-col_l, col_r = st.columns(2)
+head_col, btn_col = st.columns([6, 1])
+with head_col:
+    st.markdown("""
+    <div class="sec-head-text" style="margin-top:52px;">
+        <div class="sec-title">Performance Analysis</div>
+        <div class="sec-sub">Daily P&L · Drawdown · Rolling Sharpe · Return Distribution</div>
+    </div>
+    """, unsafe_allow_html=True)
+with btn_col:
+    st.markdown('<div style="margin-top:52px;"></div>', unsafe_allow_html=True)
+    toggle_label = "− Collapse" if st.session_state.show_perf_charts else "+ Expand"
+    if st.button(toggle_label, key="toggle_perf_charts", use_container_width=True):
+        st.session_state.show_perf_charts = not st.session_state.show_perf_charts
 
-with col_l:
-    colors = ["#34d399" if v > 0 else "#f87171" for v in net_pnl.values]
-    fig_pnl = go.Figure(go.Bar(
-        x=net_pnl.index, y=net_pnl.values * 100,
-        marker_color=colors, opacity=0.7,
-        hovertemplate="%{x|%Y-%m-%d}: %{y:.3f}%<extra></extra>"
-    ))
-    fig_pnl.update_layout(
-        title=dict(text="Daily P&L (%)", font=dict(color="#64748b", size=13)),
-        height=250, margin=dict(l=0, r=0, t=36, b=0),
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10)),
-        yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
-        showlegend=False
-    )
-    st.plotly_chart(fig_pnl, use_container_width=True)
+st.markdown('<div class="sec-head-divider"></div>', unsafe_allow_html=True)
 
-    fig_dist = go.Figure(go.Histogram(
-        x=active.values * 100, nbinsx=40,
-        marker_color="#38bdf8", opacity=0.7,
-        hovertemplate="Return: %{x:.2f}%<br>Count: %{y}<extra></extra>"
-    ))
-    fig_dist.add_vline(x=0, line_dash="dot", line_color="#334155", line_width=1)
-    fig_dist.update_layout(
-        title=dict(text="Distribution of Daily Returns", font=dict(color="#64748b", size=13)),
-        height=250, margin=dict(l=0, r=0, t=36, b=0),
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10), title="Daily Return (%)"),
-        yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
-        showlegend=False
-    )
-    st.plotly_chart(fig_dist, use_container_width=True)
+if st.session_state.show_perf_charts:
+    col_l, col_r = st.columns(2)
 
-with col_r:
-    dd_series = (cum_returns / cum_returns.cummax() - 1) * 100
-    fig_dd = go.Figure(go.Scatter(
-        x=dd_series.index, y=dd_series.values,
-        mode="lines", line=dict(color="#f87171", width=1.5),
-        fill="tozeroy", fillcolor="rgba(248,113,113,0.06)",
-        hovertemplate="%{x|%Y-%m-%d}: %{y:.2f}%<extra></extra>"
-    ))
-    fig_dd.add_hline(y=0, line_dash="dot", line_color="#1e2535", line_width=1)
-    fig_dd.update_layout(
-        title=dict(text="Drawdown from Peak (%)", font=dict(color="#64748b", size=13)),
-        height=250, margin=dict(l=0, r=0, t=36, b=0),
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10)),
-        yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
-        showlegend=False
-    )
-    st.plotly_chart(fig_dd, use_container_width=True)
+    with col_l:
+        colors = ["#34d399" if v > 0 else "#f87171" for v in net_pnl.values]
+        fig_pnl = go.Figure(go.Bar(
+            x=net_pnl.index, y=net_pnl.values * 100,
+            marker_color=colors, opacity=0.7,
+            hovertemplate="%{x|%Y-%m-%d}: %{y:.3f}%<extra></extra>"
+        ))
+        fig_pnl.update_layout(
+            title=dict(text="Daily P&L (%)", font=dict(color="#64748b", size=13)),
+            height=250, margin=dict(l=0, r=0, t=36, b=0),
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10)),
+            yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
+            showlegend=False
+        )
+        st.plotly_chart(fig_pnl, use_container_width=True)
 
-    roll_sharpe = (
-        net_pnl.rolling(63).mean() /
-        (net_pnl.rolling(63).std() + 1e-8) * np.sqrt(252)
-    )
-    fig_rs = go.Figure(go.Scatter(
-        x=roll_sharpe.index, y=roll_sharpe.values,
-        mode="lines", line=dict(color="#a78bfa", width=1.5),
-        fill="tozeroy", fillcolor="rgba(167,139,250,0.04)",
-        hovertemplate="%{x|%Y-%m-%d}: %{y:.2f}<extra></extra>"
-    ))
-    fig_rs.add_hline(y=0, line_dash="dot", line_color="#1e2535", line_width=1)
-    fig_rs.add_hline(y=1, line_dash="dot", line_color="rgba(52,211,153,0.25)", line_width=1)
-    fig_rs.update_layout(
-        title=dict(text="Rolling 63-Day Sharpe Ratio", font=dict(color="#64748b", size=13)),
-        height=250, margin=dict(l=0, r=0, t=36, b=0),
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10)),
-        yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
-        showlegend=False
-    )
-    st.plotly_chart(fig_rs, use_container_width=True)
+        fig_dist = go.Figure(go.Histogram(
+            x=active.values * 100, nbinsx=40,
+            marker_color="#38bdf8", opacity=0.7,
+            hovertemplate="Return: %{x:.2f}%<br>Count: %{y}<extra></extra>"
+        ))
+        fig_dist.add_vline(x=0, line_dash="dot", line_color="#334155", line_width=1)
+        fig_dist.update_layout(
+            title=dict(text="Distribution of Daily Returns", font=dict(color="#64748b", size=13)),
+            height=250, margin=dict(l=0, r=0, t=36, b=0),
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10), title="Daily Return (%)"),
+            yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
+            showlegend=False
+        )
+        st.plotly_chart(fig_dist, use_container_width=True)
 
-# Flow chart
-st.markdown("""
-<div class="sec-head">
-    <div class="sec-title">Pipeline Architecture</div>
-    <div class="sec-sub">Transforming Raw Market Data to a Long-Short Portfolio</div>
-</div>
-<div class="flowchart">
-    <div class="flow-box flow-box-active">
-        <div class="flow-icon">📥</div>
-        <div class="flow-label">Market Data</div>
-        <div class="flow-sub">~100 S&P 500 stocks<br>daily prices 2021–2024</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box">
-        <div class="flow-icon">🔬</div>
-        <div class="flow-label">Factor Engineering</div>
-        <div class="flow-sub">6 predictive signals<br>computed per stock per day</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box">
-        <div class="flow-icon">🤖</div>
-        <div class="flow-label">LightGBM Model</div>
-        <div class="flow-sub">Learns which signals<br>matter most · Walk-forward</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box">
-        <div class="flow-icon">📊</div>
-        <div class="flow-label">Long-Short Portfolio</div>
-        <div class="flow-sub">Long top 20%<br>Short bottom 20%</div>
-    </div>
-    <div class="flow-arrow">
-        <div class="flow-arrow-inner">
-            <div class="flow-arrow-line"></div>
-            <div class="flow-arrow-head"></div>
-        </div>
-    </div>
-    <div class="flow-box flow-box-active">
-        <div class="flow-icon">✅</div>
-        <div class="flow-label">Results</div>
-        <div class="flow-sub">IC = 0.034 · ICIR = 0.83<br>Out-of-sample</div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    with col_r:
+        dd_series = (cum_returns / cum_returns.cummax() - 1) * 100
+        fig_dd = go.Figure(go.Scatter(
+            x=dd_series.index, y=dd_series.values,
+            mode="lines", line=dict(color="#f87171", width=1.5),
+            fill="tozeroy", fillcolor="rgba(248,113,113,0.06)",
+            hovertemplate="%{x|%Y-%m-%d}: %{y:.2f}%<extra></extra>"
+        ))
+        fig_dd.add_hline(y=0, line_dash="dot", line_color="#1e2535", line_width=1)
+        fig_dd.update_layout(
+            title=dict(text="Drawdown from Peak (%)", font=dict(color="#64748b", size=13)),
+            height=250, margin=dict(l=0, r=0, t=36, b=0),
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10)),
+            yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
+            showlegend=False
+        )
+        st.plotly_chart(fig_dd, use_container_width=True)
 
+        roll_sharpe = (
+            net_pnl.rolling(63).mean() /
+            (net_pnl.rolling(63).std() + 1e-8) * np.sqrt(252)
+        )
+        fig_rs = go.Figure(go.Scatter(
+            x=roll_sharpe.index, y=roll_sharpe.values,
+            mode="lines", line=dict(color="#a78bfa", width=1.5),
+            fill="tozeroy", fillcolor="rgba(167,139,250,0.04)",
+            hovertemplate="%{x|%Y-%m-%d}: %{y:.2f}<extra></extra>"
+        ))
+        fig_rs.add_hline(y=0, line_dash="dot", line_color="#1e2535", line_width=1)
+        fig_rs.add_hline(y=1, line_dash="dot", line_color="rgba(52,211,153,0.25)", line_width=1)
+        fig_rs.update_layout(
+            title=dict(text="Rolling 63-Day Sharpe Ratio", font=dict(color="#64748b", size=13)),
+            height=250, margin=dict(l=0, r=0, t=36, b=0),
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=10)),
+            yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155", tickfont=dict(size=10)),
+            showlegend=False
+        )
+        st.plotly_chart(fig_rs, use_container_width=True)
 
 # ── FACTOR ANALYSIS ───────────────────────────────────────────────────────────
 st.markdown("""
@@ -663,7 +716,7 @@ factors = [
 
 max_ic = max(abs(f[3]) for f in factors)
 
-st.markdown('<div class="stattbl" style="padding:4px 0;">', unsafe_allow_html=True)
+_factor_rows_html = ""
 for code, name, desc, ic, used in factors:
     bar_w  = int(abs(ic) / max_ic * 100)
     bar_c  = "#34d399" if used else "#f87171"
@@ -671,7 +724,7 @@ for code, name, desc, ic, used in factors:
     ic_str = f"+{ic:.4f}" if ic > 0 else f"{ic:.4f}"
     badge  = f'<span class="ft-badge" style="background:rgba(52,211,153,0.08);color:#34d399;border:1px solid rgba(52,211,153,0.2);">✓ used</span>' if used else \
              f'<span class="ft-badge" style="background:rgba(248,113,113,0.08);color:#f87171;border:1px solid rgba(248,113,113,0.2);">✗ excl.</span>'
-    st.markdown(f"""
+    _factor_rows_html += f"""
     <div class="ftrow">
         <div class="ft-name">{code}</div>
         <div style="flex:1;">
@@ -682,8 +735,9 @@ for code, name, desc, ic, used in factors:
         <div class="ft-ic" style="color:{ic_c};">IC {ic_str}</div>
         {badge}
     </div>
-    """, unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+    """
+
+st.markdown(f'<div class="stattbl" style="padding:4px 0;">{_factor_rows_html}</div>', unsafe_allow_html=True)
 
 
 # ── SHAP as Plotly chart ──────────────────────────────────────────────────────

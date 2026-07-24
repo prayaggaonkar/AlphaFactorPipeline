@@ -22,7 +22,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 section[data-testid="stSidebar"] { display: none; }
 #MainMenu, footer, header { visibility: hidden; }
 
-/* ── Hero ── */
 .hero {
     background: linear-gradient(135deg, #0d1f3c 0%, #080f20 60%, #050912 100%);
     border: 1px solid #162035;
@@ -62,60 +61,113 @@ section[data-testid="stSidebar"] { display: none; }
     color: #64748b;
     line-height: 1.8;
     max-width: 700px;
-    margin-bottom: 24px;
 }
 
-/* Expand button */
-.expand-btn {
+.hero-more {
+    max-width: 700px;
+    margin-top: 18px;
+    position: relative;
+    z-index: 1;
+}
+.hero-more summary {
+    list-style: none;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
     color: #38bdf8;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    background: rgba(56,189,248,0.04);
+    transition: background 0.15s ease, border-color 0.15s ease;
+    width: fit-content;
+}
+.hero-more summary:hover {
+    background: rgba(56,189,248,0.09);
+    border-color: #38bdf8;
+}
+.hero-more summary::-webkit-details-marker { display: none; }
+.hero-more summary::after {
+    content: '+';
+    font-size: 15px;
+    line-height: 1;
+    margin-left: 2px;
+    transition: transform 0.15s ease;
+}
+.hero-more[open] summary::after { content: '−'; }
+.hero-more-content {
+    margin-top: 16px;
+    font-size: 15px;
+    color: #64748b;
+    line-height: 1.8;
+    padding: 20px 24px;
+    background: rgba(5,10,20,0.4);
+    border: 1px solid #131e30;
+    border-radius: 12px;
+}
+.hero-more-content strong { color: #e2e8f0; }
+
+.hero-github {
+    position: absolute;
+    top: 32px;
+    right: 36px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    background: rgba(56,189,248,0.04);
+    color: #38bdf8;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.hero-github:hover { background: rgba(56,189,248,0.09); border-color: #38bdf8; }
+.hero-github svg { width: 15px; height: 15px; fill: #38bdf8; }
+
+.info-details { margin: 16px 0; }
+.info-details summary {
+    list-style: none;
     cursor: pointer;
-    background: rgba(56,189,248,0.07);
-    border: 1px solid rgba(56,189,248,0.18);
-    border-radius: 6px;
-    padding: 6px 14px;
-    font-family: 'Inter', sans-serif;
-    margin-bottom: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: #38bdf8;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    background: rgba(56,189,248,0.04);
+    transition: background 0.15s ease, border-color 0.15s ease;
+    width: fit-content;
 }
+.info-details summary:hover {
+    background: rgba(56,189,248,0.09);
+    border-color: #38bdf8;
+}
+.info-details summary::-webkit-details-marker { display: none; }
+.info-details summary::after {
+    content: '+';
+    font-size: 15px;
+    line-height: 1;
+    margin-left: 2px;
+}
+.info-details[open] summary::after { content: '−'; }
+.info-details .exp { margin-top: 12px; margin-bottom: 0; }
 
-/* Streamlit expander override to look like part of the hero */
-div[data-testid="stExpander"] {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-div[data-testid="stExpander"] > details {
-    background: transparent !important;
-    border: none !important;
-}
-div[data-testid="stExpander"] summary {
-    font-size: 13px !important;
-    color: #38bdf8 !important;
-    background: rgba(56,189,248,0.07) !important;
-    border: 1px solid rgba(56,189,248,0.18) !important;
-    border-radius: 6px !important;
-    padding: 6px 14px !important;
-    width: fit-content !important;
-}
-div[data-testid="stExpander"] summary:hover {
-    background: rgba(56,189,248,0.12) !important;
-}
-div[data-testid="stExpander"] summary svg { display: none !important; }
-div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
-    background: rgba(11,17,32,0.6) !important;
-    border: 1px solid #162035 !important;
-    border-radius: 10px !important;
-    padding: 20px 24px !important;
-    margin-top: 12px !important;
-    font-size: 14px !important;
-    color: #64748b !important;
-    line-height: 1.8 !important;
-}
-
-/* ── Section ── */
 .sec-head {
     display: flex;
     align-items: baseline;
@@ -127,35 +179,48 @@ div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
 .sec-title { font-size: 20px; font-weight: 600; color: #e2e8f0; }
 .sec-sub   { font-size: 13px; color: #334155; }
 
-/* ── Metric cards ── */
 .mcard {
     background: #0b1120;
     border: 1px solid #131e30;
     border-radius: 14px;
     padding: 22px 26px 20px;
     height: 100%;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
 }
 .mcard-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: #334155;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.09em;
-    margin-bottom: 10px;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
 }
 .mcard-val {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 30px;
+    font-size: 38px;
     font-weight: 600;
     line-height: 1;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
-.mcard-sub { font-size: 12px; color: #1e3a5f; line-height: 1.5; }
+.mcard-sub { font-size: 12px; color: #1e3a5f; line-height: 1.55; margin-top: auto; }
+.mcard-formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #7dd3fc;
+    background: rgba(56,189,248,0.06);
+    border: 1px solid #14304a;
+    border-radius: 6px;
+    padding: 5px 9px;
+    display: inline-block;
+    margin-top: 8px;
+    letter-spacing: 0.01em;
+}
 .pos { color: #34d399; }
 .neg { color: #f87171; }
 .neu { color: #38bdf8; }
 
-/* ── Explainer ── */
 .exp {
     background: #0b1120;
     border: 1px solid #131e30;
@@ -169,13 +234,14 @@ div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
 }
 .exp strong { color: #e2e8f0; }
 
-/* ── Flowchart ── */
+/* Flow chart */
 .flowchart {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0;
     margin: 28px 0;
+    flex-wrap: nowrap;
 }
 .flow-box {
     background: #0b1120;
@@ -183,46 +249,53 @@ div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
     border-radius: 12px;
     padding: 20px 18px;
     text-align: center;
+    min-width: 140px;
     flex: 1;
     max-width: 180px;
+    position: relative;
 }
-.flow-box-active { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56,189,248,0.08); }
-.flow-icon  { font-size: 24px; margin-bottom: 10px; }
-.flow-label { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; line-height: 1.3; }
-.flow-sub   { font-size: 11px; color: #334155; line-height: 1.5; }
-
-/* Arrow: flex column, line + arrowhead perfectly centered */
+.flow-box-active {
+    border-color: #38bdf8;
+    box-shadow: 0 0 20px rgba(56,189,248,0.08);
+}
+.flow-icon { font-size: 24px; margin-bottom: 10px; }
+.flow-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+.flow-sub {
+    font-size: 11px;
+    color: #334155;
+    line-height: 1.5;
+}
 .flow-arrow {
     display: flex;
     align-items: center;
-    justify-content: center;
+    padding: 0 6px;
     flex-shrink: 0;
-    width: 36px;
-    position: relative;
+}
+.flow-arrow-inner {
+    display: flex;
+    align-items: center;
 }
 .flow-arrow-line {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
     width: 28px;
     height: 1px;
     background: linear-gradient(90deg, #1e3a5f, #38bdf8);
+    flex-shrink: 0;
 }
 .flow-arrow-head {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
     width: 0;
     height: 0;
     border-top: 4px solid transparent;
     border-bottom: 4px solid transparent;
     border-left: 7px solid #38bdf8;
+    flex-shrink: 0;
 }
 
-/* ── Factor table ── */
-.stattbl { background: #0b1120; border: 1px solid #131e30; border-radius: 12px; overflow: hidden; }
 .ftrow {
     display: flex;
     align-items: center;
@@ -231,14 +304,14 @@ div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
     gap: 16px;
 }
 .ftrow:last-child { border-bottom: none; }
-.ft-name    { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #7dd3fc; min-width: 110px; }
-.ft-desc    { font-size: 12px; color: #334155; flex: 1; }
-.ft-bar-bg  { width: 100px; height: 5px; background: #111827; border-radius: 3px; flex-shrink: 0; }
-.ft-bar     { height: 100%; border-radius: 3px; }
-.ft-ic      { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; min-width: 64px; text-align: right; }
-.ft-badge   { font-size: 10px; padding: 2px 7px; border-radius: 4px; min-width: 52px; text-align: center; }
+.ft-name  { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #7dd3fc; min-width: 110px; }
+.ft-desc  { font-size: 12px; color: #334155; flex: 1; }
+.ft-bar-bg { width: 100px; height: 5px; background: #111827; border-radius: 3px; flex-shrink: 0; }
+.ft-bar    { height: 100%; border-radius: 3px; }
+.ft-ic     { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; min-width: 64px; text-align: right; }
+.ft-badge  { font-size: 10px; padding: 2px 7px; border-radius: 4px; min-width: 52px; text-align: center; }
 
-/* ── Stat table ── */
+.stattbl { background: #0b1120; border: 1px solid #131e30; border-radius: 12px; overflow: hidden; }
 .strow {
     display: flex;
     justify-content: space-between;
@@ -251,7 +324,6 @@ div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
 .strow-label { color: #334155; }
 .strow-val   { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 13px; }
 
-/* ── Code block ── */
 .codebox {
     background: #060a10;
     border: 1px solid #131e30;
@@ -265,7 +337,6 @@ div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
 .codebox .key { color: #38bdf8; }
 .codebox .val { color: #a78bfa; }
 
-/* ── Footer ── */
 .footer {
     text-align: center;
     padding: 48px 0 24px;
@@ -289,11 +360,12 @@ def load_results():
 
 cum_returns, net_pnl, data_loaded = load_results()
 
-def mcard(label, val, sub, cls="neu"):
+def mcard(label, val, sub, cls="neu", formula=None):
+    formula_html = f'<div class="mcard-formula">{formula}</div>' if formula else ""
     return f"""<div class="mcard">
         <div class="mcard-label">{label}</div>
         <div class="mcard-val {cls}">{val}</div>
-        <div class="mcard-sub">{sub}</div>
+        <div class="mcard-sub">{sub}{formula_html}</div>
     </div>"""
 
 def stat_table(rows):
@@ -307,7 +379,11 @@ def stat_table(rows):
 # ── HERO ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-    <div class="hero-eyebrow">Quantitative Research · Machine Learning · Equity Markets</div>
+    <a class="hero-github" href="https://github.com/prayaggaonkar/AlphaFactorPipeline" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        View on GitHub
+    </a>
+    <div class="hero-eyebrow">Quantitative Research · Machine Learning · Stock Markets</div>
     <div class="hero-title">Alpha Factor<br><em>Discovery Engine</em></div>
     <div class="hero-body">
         A machine learning system that learns which stock characteristics predict 
@@ -315,29 +391,32 @@ st.markdown("""
         Built with walk-forward validation, SHAP explainability, and realistic transaction cost modeling.
         Every number on this page is out-of-sample.
     </div>
+    <details class="hero-more">
+        <summary>More about this project</summary>
+        <div class="hero-more-content">
+            <strong>The core idea:</strong> Every day, some stocks go up more than others. Can we predict which ones?
+            This project builds a machine learning pipeline that studies patterns in historical stock data — 
+            things like whether a stock is trading below its recent average, or whether it's been unusually volatile — 
+            and learns to predict which stocks will outperform over the next month.
+            <br><br>
+            <strong>How it makes money:</strong> Each month, it <em>buys</em> the stocks the model ranks highest 
+            and simultaneously <em>bets against</em> the stocks it ranks lowest, in equal dollar amounts. 
+            This structure means the strategy doesn't care whether the overall market goes up or down — 
+            it only needs its top picks to beat its bottom picks.
+            <br><br>
+            <strong>Why it's hard to cheat:</strong> The model is evaluated using walk-forward validation — 
+            it only ever trains on past data and is tested on future data it has never seen. 
+            Every number on this page is a genuine out-of-sample result.
+        </div>
+    </details>
 </div>
 """, unsafe_allow_html=True)
-
-with st.expander("Learn how this works ↓"):
-    st.markdown("""
-**The core idea:** Every day, some stocks go up more than others. Can we predict which ones?
-This project builds a machine learning pipeline that studies patterns in historical stock data —
-things like whether a stock is trading below its recent average, or whether it's been unusually volatile —
-and learns to predict which stocks will outperform over the next month.
-
-**How it makes money:** Each month, it *buys* the stocks the model ranks highest and simultaneously
-*bets against* the stocks it ranks lowest, in equal dollar amounts. This structure means the strategy
-doesn't care whether the overall market goes up or down — it only needs its top picks to beat its bottom picks.
-
-**Why it's hard to cheat:** The model is evaluated using walk-forward validation — it only ever trains
-on past data and is tested on future data it has never seen. Every number on this page is a genuine out-of-sample result.
-""")
 
 if not data_loaded:
     st.error("Run `python main.py` first to generate results, then refresh this page.")
     st.stop()
 
-# ── Metrics ───────────────────────────────────────────────────────────────────
+# ── Compute metrics ───────────────────────────────────────────────────────────
 active   = net_pnl[net_pnl != 0]
 ann_ret  = active.mean() * 252 * 100
 ann_vol  = active.std() * np.sqrt(252) * 100
@@ -347,56 +426,57 @@ win_rate = (active > 0).mean() * 100
 calmar   = ann_ret / abs(max_dd) if max_dd != 0 else 0
 
 
-# ── PIPELINE FLOWCHART ────────────────────────────────────────────────────────
-st.markdown("""
-<div class="sec-head">
-    <div class="sec-title">Research Pipeline</div>
-    <div class="sec-sub">From raw market data to out-of-sample trading results</div>
-</div>
-""", unsafe_allow_html=True)
-
+# Flow chart
 st.markdown("""
 <div class="flowchart">
     <div class="flow-box flow-box-active">
         <div class="flow-icon">📥</div>
         <div class="flow-label">Market Data</div>
-        <div class="flow-sub">~100 S&P 500 stocks · daily prices · 2021–2024</div>
+        <div class="flow-sub">~100 S&P 500 stocks<br>daily prices 2021–2024</div>
     </div>
     <div class="flow-arrow">
-        <div class="flow-arrow-line"></div>
-        <div class="flow-arrow-head"></div>
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
     </div>
     <div class="flow-box">
         <div class="flow-icon">🔬</div>
         <div class="flow-label">Factor Engineering</div>
-        <div class="flow-sub">6 predictive signals computed per stock per day</div>
+        <div class="flow-sub">6 predictive signals<br>computed per stock per day</div>
     </div>
     <div class="flow-arrow">
-        <div class="flow-arrow-line"></div>
-        <div class="flow-arrow-head"></div>
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
     </div>
     <div class="flow-box">
         <div class="flow-icon">🤖</div>
         <div class="flow-label">LightGBM Model</div>
-        <div class="flow-sub">Learns which signals matter most · walk-forward trained</div>
+        <div class="flow-sub">Learns which signals<br>matter most · walk-forward</div>
     </div>
     <div class="flow-arrow">
-        <div class="flow-arrow-line"></div>
-        <div class="flow-arrow-head"></div>
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
     </div>
     <div class="flow-box">
         <div class="flow-icon">📊</div>
         <div class="flow-label">Long-Short Portfolio</div>
-        <div class="flow-sub">Long top 20% · Short bottom 20%</div>
+        <div class="flow-sub">Long top 20%<br>Short bottom 20%</div>
     </div>
     <div class="flow-arrow">
-        <div class="flow-arrow-line"></div>
-        <div class="flow-arrow-head"></div>
+        <div class="flow-arrow-inner">
+            <div class="flow-arrow-line"></div>
+            <div class="flow-arrow-head"></div>
+        </div>
     </div>
     <div class="flow-box flow-box-active">
         <div class="flow-icon">✅</div>
         <div class="flow-label">Results</div>
-        <div class="flow-sub">IC = 0.034 · ICIR = 0.83 · out-of-sample</div>
+        <div class="flow-sub">IC = 0.034 · ICIR = 0.83<br>out-of-sample</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -418,18 +498,20 @@ dd_cls  = "neg" if max_dd < -8 else "neu"
 with c1: st.markdown(mcard("Model IC", "0.034", "How well the model ranks stocks. >0.02 is industry standard.", "pos"), unsafe_allow_html=True)
 with c2: st.markdown(mcard("ICIR", "0.83", "Consistency of predictions across market conditions. >0.5 is good.", "pos"), unsafe_allow_html=True)
 with c3: st.markdown(mcard("Ann. Return", f"{ann_ret:+.1f}%", "Annualized return on active trading days, after all costs.", ret_cls), unsafe_allow_html=True)
-with c4: st.markdown(mcard("Sharpe Ratio", f"{sharpe:.2f}", "Return per unit of risk, annualized.", shr_cls), unsafe_allow_html=True)
+with c4: st.markdown(mcard("Sharpe Ratio", f"{sharpe:.2f}", "Return per unit of risk, annualized.", shr_cls, formula="Sharpe = (R̄ − Rf) / σ"), unsafe_allow_html=True)
 with c5: st.markdown(mcard("Max Drawdown", f"{max_dd:.1f}%", "Worst peak-to-trough loss during the backtest.", dd_cls), unsafe_allow_html=True)
 with c6: st.markdown(mcard("Win Rate", f"{win_rate:.1f}%", "Percentage of active trading days with positive P&L.", "neu"), unsafe_allow_html=True)
 
 st.markdown("""
-<div class="exp" style="margin-top:20px;">
-    <strong>What IC means:</strong>
-    IC (Information Coefficient) measures how well the model's stock rankings match actual future returns.
-    An IC of 0.034 means predictions are 3.4% correlated with real outcomes — small but consistent.
-    Professionally, IC > 0.02 is considered genuine, exploitable alpha.
-    An ICIR of 0.83 confirms the signal holds across different market periods.
-</div>
+<details class="info-details" style="margin-top:20px;">
+    <summary>What IC means</summary>
+    <div class="exp">
+        IC (Information Coefficient) measures how well the model's stock rankings match actual future returns.
+        An IC of 0.034 means predictions are 3.4% correlated with real outcomes — small but consistent.
+        Professionally, IC > 0.02 is considered genuine, exploitable alpha.
+        An ICIR of 0.83 confirms the signal holds across different market periods, not just one lucky stretch.
+    </div>
+</details>
 """, unsafe_allow_html=True)
 
 
@@ -441,29 +523,28 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-y_vals  = cum_returns.values
-y_range = max(abs(y_vals.max() - 1), abs(y_vals.min() - 1))
-y_pad   = y_range * 0.3
-
 fig_nav = go.Figure()
 fig_nav.add_trace(go.Scatter(
-    x=cum_returns.index, y=y_vals,
+    x=cum_returns.index, y=cum_returns.values,
     mode="lines", name="Strategy NAV",
     line=dict(color="#38bdf8", width=2),
     fill="tozeroy", fillcolor="rgba(56,189,248,0.04)",
     hovertemplate="Date: %{x|%Y-%m-%d}<br>NAV: $%{y:.4f}<extra></extra>"
 ))
-fig_nav.add_hline(y=1.0, line_dash="dot", line_color="#334155", line_width=1)
+fig_nav.add_hline(y=1.0, line_dash="dot", line_color="#1e2535", line_width=1)
+
+# Center the y-axis around 1.0 so NAV=1.0 sits at the visual midpoint
+_max_dev = max(abs(cum_returns.max() - 1.0), abs(cum_returns.min() - 1.0))
+_pad = _max_dev * 0.15 if _max_dev > 0 else 0.01
+_y_range = [1.0 - _max_dev - _pad, 1.0 + _max_dev + _pad]
+
 fig_nav.update_layout(
     height=320,
     margin=dict(l=0, r=0, t=10, b=0),
     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
     xaxis=dict(showgrid=False, color="#334155", tickfont=dict(size=11)),
-    yaxis=dict(
-        showgrid=True, gridcolor="#0f1724", color="#334155",
-        tickfont=dict(size=11), tickformat=".4f",
-        range=[1 - y_range - y_pad, 1 + y_range + y_pad]
-    ),
+    yaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155",
+               tickfont=dict(size=11), tickformat=".4f", range=_y_range),
     showlegend=False, hovermode="x unified"
 )
 st.plotly_chart(fig_nav, use_container_width=True)
@@ -563,14 +644,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div class="exp">
-    <strong>What is a factor?</strong> A factor is a number computed for each stock on each day.
-    For example, "Distance from 50-day Moving Average" tells us how far a stock's price has drifted 
-    from its recent average. Stocks far below their average tend to bounce back — that's mean reversion.
-    We measure each factor's predictive power with <strong>IC (Information Coefficient)</strong>: 
-    the correlation between our rankings and actual future returns. IC > 0.02 is exploitable.
-    We only feed the model factors with confirmed positive IC.
-</div>
+<details class="info-details">
+    <summary>What is a factor?</summary>
+    <div class="exp">
+        A factor is a number computed for each stock on each day.
+        For example, "Distance from 50-day Moving Average" tells us how far a stock's price has drifted 
+        from its recent average. Stocks far below their average tend to bounce back — that's mean reversion.
+        We measure each factor's predictive power with <strong>IC (Information Coefficient)</strong>: 
+        the correlation between our rankings and actual future returns.
+        IC > 0.02 is exploitable. We only feed the model factors with confirmed positive IC.
+    </div>
+</details>
 """, unsafe_allow_html=True)
 
 factors = [
@@ -609,7 +693,7 @@ for code, name, desc, ic, used in factors:
 st.markdown('</div>', unsafe_allow_html=True)
 
 
-# ── SHAP ──────────────────────────────────────────────────────────────────────
+# ── SHAP as Plotly chart ──────────────────────────────────────────────────────
 st.markdown("""
 <div class="sec-head" style="margin-top:40px;">
     <div class="sec-title">SHAP Feature Importance</div>
@@ -618,20 +702,28 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div class="exp">
-    <strong>What is SHAP?</strong> Instead of a black-box model, SHAP lets us see exactly 
-    which factors drove each prediction. The chart below shows the average absolute contribution 
-    of each factor across all predictions — the longer the bar, the more that factor influenced 
-    the model's stock rankings.
-</div>
+<details class="info-details">
+    <summary>What is SHAP?</summary>
+    <div class="exp">
+        Instead of a black-box model, SHAP lets us see exactly 
+        which factors drove each prediction. The chart below shows the average absolute contribution 
+        of each factor across all out-of-sample predictions — the longer the bar, the more that 
+        factor influenced the model's stock rankings.
+    </div>
+</details>
 """, unsafe_allow_html=True)
 
 shap_factors = ["realized_vol", "ma50_dist", "rsi", "ma20_dist", "bollinger", "rev_10d"]
 shap_values  = [0.033, 0.028, 0.018, 0.015, 0.009, 0.006]
-shap_df = pd.DataFrame({"factor": shap_factors, "importance": shap_values}).sort_values("importance")
+
+shap_df = pd.DataFrame({
+    "factor": shap_factors,
+    "importance": shap_values
+}).sort_values("importance")
 
 fig_shap = go.Figure(go.Bar(
-    x=shap_df["importance"], y=shap_df["factor"],
+    x=shap_df["importance"],
+    y=shap_df["factor"],
     orientation="h",
     marker=dict(
         color=shap_df["importance"],
@@ -643,17 +735,22 @@ fig_shap = go.Figure(go.Bar(
 fig_shap.update_layout(
     height=260,
     margin=dict(l=0, r=0, t=10, b=0),
-    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    xaxis=dict(showgrid=True, gridcolor="#0f1724", color="#334155",
-               tickfont=dict(size=11),
-               title=dict(text="Mean |SHAP value|", font=dict(color="#334155", size=11))),
-    yaxis=dict(showgrid=False, color="#7dd3fc",
-               tickfont=dict(size=12, family="JetBrains Mono"))
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    xaxis=dict(
+        showgrid=True, gridcolor="#0f1724",
+        color="#334155", tickfont=dict(size=11),
+        title=dict(text="Mean |SHAP value|", font=dict(color="#334155", size=11))
+    ),
+    yaxis=dict(
+        showgrid=False, color="#7dd3fc",
+        tickfont=dict(size=12, family="JetBrains Mono")
+    )
 )
 st.plotly_chart(fig_shap, use_container_width=True)
 
 
-# ── FULL STATS ────────────────────────────────────────────────────────────────
+# ── FULL STATS TABLE ──────────────────────────────────────────────────────────
 st.markdown("""
 <div class="sec-head">
     <div class="sec-title">Full Statistics</div>
@@ -670,33 +767,33 @@ avg_loss  = daily_active[daily_active < 0].mean() * 100
 col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown(stat_table([
-        ("Annualized Return",     f"{ann_ret:+.2f}%",  "#34d399" if ann_ret > 0 else "#f87171"),
-        ("Annualized Volatility", f"{ann_vol:.2f}%",   "#94a3b8"),
-        ("Sharpe Ratio",          f"{sharpe:.3f}",      "#34d399" if sharpe > 0 else "#f87171"),
-        ("Calmar Ratio",          f"{calmar:.3f}",      "#94a3b8"),
-        ("Max Drawdown",          f"{max_dd:.2f}%",     "#f87171"),
+        ("Annualized Return",     f"{ann_ret:+.2f}%",   "#34d399" if ann_ret > 0 else "#f87171"),
+        ("Annualized Volatility", f"{ann_vol:.2f}%",    "#94a3b8"),
+        ("Sharpe Ratio",          f"{sharpe:.3f}",       "#34d399" if sharpe > 0 else "#f87171"),
+        ("Calmar Ratio",          f"{calmar:.3f}",       "#94a3b8"),
+        ("Max Drawdown",          f"{max_dd:.2f}%",      "#f87171"),
     ]), unsafe_allow_html=True)
 
 with col2:
     st.markdown(stat_table([
-        ("Win Rate",              f"{win_rate:.1f}%",  "#94a3b8"),
-        ("Best Day",              f"+{best_day:.2f}%", "#34d399"),
-        ("Worst Day",             f"{worst_day:.2f}%", "#f87171"),
-        ("Avg Winning Day",       f"+{avg_win:.2f}%",  "#34d399"),
-        ("Avg Losing Day",        f"{avg_loss:.2f}%",  "#f87171"),
+        ("Win Rate",              f"{win_rate:.1f}%",   "#94a3b8"),
+        ("Best Day",              f"+{best_day:.2f}%",  "#34d399"),
+        ("Worst Day",             f"{worst_day:.2f}%",  "#f87171"),
+        ("Avg Winning Day",       f"+{avg_win:.2f}%",   "#34d399"),
+        ("Avg Losing Day",        f"{avg_loss:.2f}%",   "#f87171"),
     ]), unsafe_allow_html=True)
 
 with col3:
     st.markdown(stat_table([
-        ("Model IC",              "0.0343",             "#34d399"),
-        ("ICIR",                  "0.83",               "#34d399"),
-        ("Universe",              "~100 S&P 500",       "#94a3b8"),
-        ("Backtest Period",       "2022–2024",          "#94a3b8"),
-        ("Active Trading Days",   f"{len(daily_active)}","#94a3b8"),
+        ("Model IC",              "0.0343",              "#34d399"),
+        ("ICIR",                  "0.83",                "#34d399"),
+        ("Universe",              "~100 S&P 500",        "#94a3b8"),
+        ("Backtest Period",       "2022–2024",           "#94a3b8"),
+        ("Active Trading Days",   f"{len(daily_active)}", "#94a3b8"),
     ]), unsafe_allow_html=True)
 
 
-# ── TECH SPEC ─────────────────────────────────────────────────────────────────
+# ── TECHNICAL SPEC ────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="sec-head">
     <div class="sec-title">Technical Specification</div>

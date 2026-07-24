@@ -1,4 +1,4 @@
-yamlname: Keep Streamlit App Awake
+name: Keep Streamlit App Awake
 
 on:
   schedule:
